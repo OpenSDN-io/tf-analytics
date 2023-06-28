@@ -102,7 +102,8 @@ class CfgParser(object):
             'config_db_username': None,
             'config_db_password': None,
             'config_db_use_ssl': False,
-            'config_db_ca_certs': None
+            'config_db_ca_certs': None,
+            'cassandra_driver': 'thrift',
         }
 
         kafka_opts = {
@@ -231,6 +232,8 @@ class CfgParser(object):
             help="Location of kafka ssl host certificate")
         parser.add_argument("--kafka_ca_cert", type=str,
             help="Location of kafka ssl CA certificate")
+        parser.add_argument("--cassandra_driver",
+            help="Cassandra Driver")
         SandeshConfig.add_parser_arguments(parser)
         self._args = parser.parse_args(remaining_argv)
         if isinstance(self._args.collectors, (basestring, str)):
@@ -352,7 +355,8 @@ class CfgParser(object):
                 'password': self._args.config_db_password,
                 'use_ssl': self._args.config_db_use_ssl,
                 'ca_certs': self._args.config_db_ca_certs,
-                'cluster_id': self._args.cluster_id}
+                'cluster_id': self._args.cluster_id,
+                'cassandra_driver': self._args.cassandra_driver}
     # end cassandra_params
 
     def sandesh_config(self):

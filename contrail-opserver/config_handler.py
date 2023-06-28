@@ -63,7 +63,8 @@ class ConfigHandler(object):
                 self._cassandra_cfg['cluster_id'], logger=self._logger.log,
                 credential=cassandra_credential,
                 ssl_enabled=self._cassandra_cfg['use_ssl'],
-                ca_certs=self._cassandra_cfg['ca_certs'])
+                ca_certs=self._cassandra_cfg['ca_certs'],
+                cassandra_driver=self._cassandra_cfg['cassandra_driver'])
         except Exception as e:
             template = 'Exception {0} connecting to Config DB. Arguments:\n{1!r}'
             msg = template.format(type(e).__name__, e.args)

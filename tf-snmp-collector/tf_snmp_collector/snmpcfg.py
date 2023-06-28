@@ -111,7 +111,8 @@ Mibs = LldpTable, ArpTable
             'config_db_username': None,
             'config_db_password': None,
             'config_db_use_ssl': False,
-            'config_db_ca_certs': None
+            'config_db_ca_certs': None,
+            'cassandra_driver': 'thrift',
         }
 
         sandesh_opts = SandeshConfig.get_default_options()
@@ -199,6 +200,8 @@ Mibs = LldpTable, ArpTable
             help="ip:port of zookeeper server")
         parser.add_argument("--cluster_id",
             help="Used for database keyspace separation")
+        parser.add_argument("--cassandra_driver",
+            help="Cassandra Driver")
         SandeshConfig.add_parser_arguments(parser)
         group = parser.add_mutually_exclusive_group(required=False)
         group.add_argument("--device-config-file",
@@ -271,5 +274,6 @@ Mibs = LldpTable, ArpTable
                 'password': self._args.config_db_password,
                 'use_ssl': self._args.config_db_use_ssl,
                 'ca_certs': self._args.config_db_ca_certs,
-                'cluster_id': self._args.cluster_id}
+                'cluster_id': self._args.cluster_id,
+                'cassandra_driver': self._args.cassandra_driver}
     # end cassandra_params
