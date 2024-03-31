@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='alarm_partial_sysinfo',
-    version='0.1dev',
+    version='0.1.dev0',
     packages=find_packages(),
     entry_points = {
         'contrail.analytics.alarms': [
