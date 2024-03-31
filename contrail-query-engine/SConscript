@@ -46,21 +46,21 @@ database_libs = ['cassandra_cql', 'cassandra']
 database_libs.append('gendb')
 env.Prepend(LIBS=database_libs)
 
-def MapBuildDir(list):
-    return map(lambda x: '#/' + Dir('.').path + '/../' + x, list)
+def MapBuildDir(dirs):
+    return list(map(lambda x: '#/' + Dir('.').path + '/../' + x, dirs))
 
 
 def SrcBuildDir(x):
     return '#/' + Dir('.').path + '/../' + x;
 
 libs = MapBuildDir([
-        'xml',
-        'base',
-        'io',
-	'net',
-        'http', 
-        'http/client',
-        'sandesh'])
+    'xml',
+    'base',
+    'io',
+    'net',
+    'http', 
+    'http/client',
+    'sandesh'])
 
 env.Append(LIBPATH=libs)
 env.Append(LIBPATH=['.', SrcBuildDir('base'),
@@ -127,8 +127,8 @@ qed_except_sources = [
     'where_query.cc',
 ]
 
-qed_objs = map(lambda x : env.Object(x), qed_sources)
-qed_except_objs = map(lambda x : env_excep.Object(x), qed_except_sources)
+qed_objs = list(map(lambda x : env.Object(x), qed_sources))
+qed_except_objs = list(map(lambda x : env_excep.Object(x), qed_except_sources))
 
 env.GenerateBuildInfoCode(
     target = ['buildinfo.h', 'buildinfo.cc'],
@@ -137,7 +137,7 @@ env.GenerateBuildInfoCode(
     ['../analytics/redis_connection.cc', '../analytics/vizd_table_desc.cc', 'rac_alloc.cc'],
     path = Dir('.').path)
 
-build_obj = map(lambda x : env.Object(x), ['buildinfo.cc'])
+build_obj = list(map(lambda x : env.Object(x), ['buildinfo.cc']))
 
 lib_cpuinfo = File('../base/libcpuinfo.a')
 lib_base = File('../base/libbase.a')

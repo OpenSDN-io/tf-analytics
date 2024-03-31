@@ -6,8 +6,10 @@
 # analytics directory
 
 import os
+import six
 import sys
 import platform
+import shutil
 
 Import('BuildEnv')
 AnalyticsEnv = BuildEnv.Clone()
@@ -16,7 +18,8 @@ if sys.platform != 'darwin':
 
 # get appropriate python lib
 import subprocess
-output,error = subprocess.Popen(["python","-V"],stdout = subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+_, error = subprocess.Popen(["python", "-V"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+error = six.ensure_str(error)
 full_version = error.split()[1].split('.')
 python = 'python'+full_version[0]+'.'+full_version[1]
 
@@ -32,8 +35,8 @@ AnalyticsEnv.Append(CPPPATH = ['/usr/include/'+ python,
                               ])
 AnalyticsEnv.Append(LIBS=['boost_python', python])
 
-def MapBuildDir(list):
-    return map(lambda x: '#/' + Dir('.').path + '/../' + x, list)
+def MapBuildDir(dirs):
+    return list(map(lambda x: '#/' + Dir('.').path + '/../' + x, dirs))
 
 etcd_incl = os.environ.get('CONTRAIL_ETCD_INCL');
 
@@ -215,16 +218,13 @@ AnalyticsEnv.SConscript('ruleparser/SConscript', exports='AnalyticsEnv', duplica
 test_suite = AnalyticsEnv.SConscript('test/SConscript', exports='AnalyticsEnv', duplicate = 0)
 
 def code_coverage(target, source, env):
-    import shutil
     shutil.rmtree(target[0].path, ignore_errors = True)
 
     # lcov --base-directory $ROOT -- directory . --zerocounters -q
-    import os
     rundir = os.path.dirname(target[0].path)
     os.system('lcov --base-directory . --directory ' + rundir +
               ' --zerocounters -q')
     # execute tests
-    import subprocess
     ShEnv = {env['ENV_SHLIB_PATH']: 'build/lib'}
 
     for test in test_suite:
