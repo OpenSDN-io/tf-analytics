@@ -1,4 +1,5 @@
 // actual google test classes
+
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
@@ -12,6 +13,7 @@
 #include "contrail-collector/db_handler.h"
 #include "contrail-collector/test/cql_if_mock.h"
 #include "base/test/task_test_util.h"
+
 
 using ::testing::_;
 using ::testing::Return;
@@ -53,9 +55,6 @@ class DbQueryUnitTest: public ::testing::Test {
              GenDb::GenDbIf::DbGetRowCb cb);
     void subquery_processed(QueryUnit *subquery);
     void cb(void *handle, QEOpServerProxy::QPerfInfo qpi, std::auto_ptr<WhereResultT> where_result);
-
-    std::map<uint64_t, map_value> m;
-    std::map<uint64_t, const std::auto_ptr<GenDb::NewColVec> > kv;
 };
 
 bool DbQueryUnitTest::TestFailureHandling(const std::string& cfname,
