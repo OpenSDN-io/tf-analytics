@@ -13,7 +13,6 @@
 from __future__ import absolute_import
 from builtins import str
 import os
-import sys
 import threading
 threading._DummyThread._Thread__stop = lambda x: 42
 import signal
@@ -32,14 +31,12 @@ from .utils.generator_fixture import GeneratorFixture
 from .utils.stats_fixture import StatsFixture
 from mockcassandra import mockcassandra
 import logging
-import time
 from opserver.sandesh.viz.constants import *
 from opserver.opserver import OpServer
 from opserver.vnc_cfg_api_client import VncCfgApiClient
 from sandesh_common.vns.ttypes import Module
 from sandesh_common.vns.constants import ModuleNames
 from .utils.util import find_buildroot
-from cassandra.cluster import Cluster
 import bottle
 
 logging.basicConfig(level=logging.INFO,
@@ -50,9 +47,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def setUpClass(cls):
-        if AnalyticsTest._check_skip_test() is True:
-            return
-
         if (os.getenv('LD_LIBRARY_PATH', '').find('build/lib') < 0):
             if (os.getenv('DYLD_LIBRARY_PATH', '').find('build/lib') < 0):
                 assert(False)
@@ -62,11 +56,7 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def tearDownClass(cls):
-        if AnalyticsTest._check_skip_test() is True:
-            return
-
         mockcassandra.stop_cassandra(cls.cassandra_port)
-        pass
 
     def setUp(self):
         super(AnalyticsTest, self).setUp()
@@ -102,8 +92,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         opserver.
         '''
         logging.info("%%% test_01_startup %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -122,8 +110,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         opserver.
         '''
         logging.info("%%% test_02_message_table_query %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -153,8 +139,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         QE.
         '''
         logging.info("%%% test_03_flow_query %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -188,8 +172,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if session stats can be accessed from QE
         '''
         logging.info("%%% test_04_session_query  %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
                              self.__class__.cassandra_port))
@@ -223,8 +205,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         QE.
         '''
         logging.info("%%% test_04_intervn_query %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         # set the start time in analytics db 1 hour earlier than
         # the current time. For flow series test, we need to create
@@ -299,8 +279,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         the analytics db.
         '''
         logging.info('%%% test_06_send_tracebuffer %%%')
-        if AnalyticsTest._check_skip_test() is True:
-            return True
         
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -344,9 +322,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         fields in the where query 
         '''
         logging.info("%%% test_08_where_clause_query %%%")
-
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -414,9 +389,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         '''
         logging.info('%%% test_10_verify_object_value_table_query %%%')
         
-        if AnalyticsTest._check_skip_test() is True:
-            return True
-
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
                              self.__class__.cassandra_port))
@@ -682,8 +654,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
     def test_16_rbac(self, mock_is_role_cloud_admin,
             mock_get_resource_list_from_uve_type):
         logging.info("%%% test_16_rbac %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -722,8 +692,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
     @mock.patch.object(OpServer, 'is_role_cloud_admin')
     def test_17_rbac_alarms(self, mock_is_role_cloud_admin):
         logging.info("%%% test_17_rbac_alarms %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -740,35 +708,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         return False
     # end test_17_rbac_alarms
 
-    #@unittest.skip('Test QE when redis is ssl enabled')
-    def test_19_query_with_redis_ssl(self):
-        '''
-        This test starts redis,vizd,opserver and qed in
-        redis ssl enabled environment.
-        It then posts query to opserver to get syslog from
-        query-engine.
-        '''
-        logging.info("%%% test_19_query_with_redis_ssl %%%")
-        if AnalyticsTest._check_skip_test() is True:
-            return True
-
-        redis_ssl_params = {
-            'keyfile': builddir+'/opserver/test/data/ssl/server-privkey.pem',
-            'certfile': builddir+'/opserver/test/data/ssl/server.pem',
-            'ca_cert': builddir+'/opserver/test/data/ssl/ca-cert.pem',
-            'ssl_enable': True
-        }
-
-        vizd_obj = self.useFixture(
-            AnalyticsFixture(logging, builddir,
-                             self.__class__.cassandra_port,
-                             redis_ssl_params = redis_ssl_params,
-                             opserver_redis_ssl=False))
-        assert vizd_obj.verify_on_setup()
-        assert vizd_obj.verify_message_table_moduleid()
-        return True
-    # end test_19_query_with_redis_ssl
-
     @staticmethod
     def get_free_port():
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -777,15 +716,10 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         cs.close()
         return cport
 
-    @staticmethod
-    def _check_skip_test():
-        if (socket.getfqdn("127.0.0.1") == 'build01'):
-            logging.info("Skipping test")
-            return True
-        return False
 
 def _term_handler(*_):
     raise IntSignal()
+
 
 if __name__ == '__main__':
     gevent.signal(signal.SIGINT,_term_handler)

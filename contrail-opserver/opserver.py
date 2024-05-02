@@ -42,9 +42,8 @@ import random
 import hashlib
 import errno
 import copy
-import datetime
-import platform
 
+import six
 from six.moves import configparser
 
 from .analytics_db import AnalyticsDb
@@ -76,14 +75,12 @@ from .sandesh.nodeinfo.process_info.ttypes import *
 from .opserver_util import OpServerUtils
 from .opserver_util import AnalyticsDiscovery
 from .sandesh_req_impl import OpserverSandeshReqImpl
-from .sandesh.analytics.ttypes import DbInfoSetRequest, \
-     DbInfoGetRequest, DbInfoResponse
+from .sandesh.analytics.ttypes import DbInfoSetRequest
 from .overlay_to_underlay_mapper import OverlayToUnderlayMapper, \
      OverlayToUnderlayMapperError
 from .generator_introspect_util import GeneratorIntrospectUtil
-from stevedore import hook, extension
+from stevedore import extension
 from .partition_handler import PartInfo, UveStreamer, UveCacheProcessor
-from functools import wraps
 from .vnc_cfg_api_client import VncCfgApiClient
 from .opserver_local import LocalApp
 from .opserver_util import AnalyticsDiscovery
@@ -95,10 +92,6 @@ from .sandesh.analytics_api_info.ttypes import AnalyticsApiInfoUVE, \
     UVEDbCacheUveRequest, UVEDbCacheUveResponse
 from cfgm_common.exceptions import BadRequest, HttpError, PermissionDenied, AuthFailed
 from .opserver_util import convert_to_string
-try:
-    basestring
-except NameError:
-    basestring = str
 
 
 _ERRORS = {
@@ -796,7 +789,7 @@ class OpServer(object):
         self._uvepartitions_state = ConnectionStatus.UP
 
         self.redis_uve_list = []
-        if isinstance(self._args.redis_uve_list, (basestring, str)):
+        if isinstance(self._args.redis_uve_list, six.string_types):
             self._args.redis_uve_list = self._args.redis_uve_list.split()
         ad_freq = 10
         us_freq = 5
@@ -1264,13 +1257,13 @@ class OpServer(object):
             help="Location of analytics api ssl CA certificate")
         SandeshConfig.add_parser_arguments(parser)
         self._args = parser.parse_args(remaining_argv)
-        if isinstance(self._args.collectors, (basestring, str)):
+        if isinstance(self._args.collectors, six.string_types):
             self._args.collectors = self._args.collectors.split()
-        if isinstance(self._args.redis_uve_list, (basestring, str)):
+        if isinstance(self._args.redis_uve_list, six.string_types):
             self._args.redis_uve_list = self._args.redis_uve_list.split()
-        if isinstance(self._args.zk_list, (basestring, str)):
+        if isinstance(self._args.zk_list, six.string_types):
             self._args.zk_list= self._args.zk_list.split()
-        if isinstance(self._args.api_server, (basestring, str)):
+        if isinstance(self._args.api_server, six.string_types):
             self._args.api_server = self._args.api_server.split()
 
         self._args.redis_use_ssl = (str(self._args.redis_use_ssl).lower() == 'true')
@@ -2376,20 +2369,19 @@ class OpServer(object):
         node_type = Module2NodeType[module_id]
         node_type_name = NodeTypeNames[node_type]
         instance_id_str = INSTANCE_ID_DEFAULT
-        destination = source + ':' + node_type_name + ':' + module + ':' + \
-                instance_id_str
+        destination = source + ':' + node_type_name + ':' + module + ':' + instance_id_str
         req = DbInfoSetRequest(disk_usage_percentage, pending_compaction_tasks)
+        du = ('%u%%' % disk_usage_percentage) if disk_usage_percentage else 'None'
+        pc = ('%u' % pending_compaction_tasks) if pending_compaction_tasks else 'None'
         if self._state_server.redis_publish(msg_type='db-info',
                                             destination=destination, msg=req):
-            self._logger.info('redis-publish success for disk_usage (%u%%), '
-                              'pending_compaction_tasks(%u)',
-                              req.disk_usage_percentage,
-                              req.pending_compaction_tasks)
+            self._logger.info('redis-publish success for disk_usage (%s), '
+                              'pending_compaction_tasks(%s)',
+                              du, pc)
         else:
-            self._logger.error('redis-publish failure for disk_usage (%u%%), '
-                               'pending_compaction_tasks(%u)',
-                               req.disk_usage_percentage,
-                               req.pending_compaction_tasks)
+            self._logger.error('redis-publish failure for disk_usage (%s), '
+                               'pending_compaction_tasks(%s)',
+                               du, pc)
     # end handle_db_info
 
     @validate_user_token
@@ -2680,7 +2672,7 @@ class OpServer(object):
                 except configparser.NoOptionError as e:
                     pass
                 else:
-                    if isinstance(collectors, (basestring, str)):
+                    if isinstance(collectors, six.string_types):
                         collectors = collectors.split()
                         new_chksum = hashlib.md5(("".join(collectors)).encode()).hexdigest()
                         if new_chksum != self._chksum:
@@ -2693,7 +2685,7 @@ class OpServer(object):
                 except configparser.NoOptionError as e:
                     pass
                 else:
-                    if isinstance(api_servers, (basestring, str)):
+                    if isinstance(api_servers, six.string_types):
                         api_servers = api_servers.split()
                     new_api_server_checksum = hashlib.md5((''.join(
                         api_servers)).encode()).hexdigest()

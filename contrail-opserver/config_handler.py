@@ -19,7 +19,6 @@ from .analytics_logger import AnalyticsLogger
 
 
 class ConfigHandler(object):
-
     def __init__(self, sandesh, service_id, rabbitmq_cfg, cassandra_cfg,
                  db_cls, reaction_map, host_ip):
         self._sandesh = sandesh
@@ -38,7 +37,6 @@ class ConfigHandler(object):
 
     def start(self):
         # Connect to rabbitmq for config update notifications
-        rabbitmq_qname = self._service_id
         while True:
             try:
                 self._vnc_amqp = VncAmqpHandle(self._sandesh, self._logger,

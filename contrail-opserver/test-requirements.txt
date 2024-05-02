@@ -22,7 +22,6 @@ docker==4.2.0
 grpcio==1.29.0
 protobuf==3.12.1
 utils/mockredis
-utils/mockstunnel
 utils/mockcassandra
 utils/mockkafka
 utils/mockzoo
@@ -31,7 +30,7 @@ utils/mockzoo
 ../tools/sandesh/library/python/dist/sandesh-0.1.dev0.tar.gz
 contrail-config-common
 contrail-api-client
-../nodemgr/dist/nodemgr-0.1.dev0.tar.gz
+#../nodemgr/dist/nodemgr-0.1.dev0.tar.gz
 ../libpartition/dist/libpartition-0.1.dev0.tar.gz
 ../opserver/plugins/test/alarm_partial_sysinfo/dist/alarm_partial_sysinfo-0.1.dev0.tar.gz
 ../opserver/plugins/test/alarm_process_status/dist/alarm_process_status-0.1.dev0.tar.gz

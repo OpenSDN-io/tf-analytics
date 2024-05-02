@@ -48,7 +48,7 @@ def install_redis():
         if process.returncode is not 0:
             raise SystemError('untar '+redis_url)
     if not os.path.exists(redis_exe):
-        process = subprocess.Popen(['make', 'PREFIX=' + redis_bdir, 'install'],
+        process = subprocess.Popen(['make', 'PREFIX=' + redis_bdir, 'MALLOC=libc', 'install'],
                                    cwd=redis_bdir + '/redis-'+redis_ver)
         process.wait()
         if process.returncode is not 0:

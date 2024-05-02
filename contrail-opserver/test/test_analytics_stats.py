@@ -13,7 +13,6 @@
 from __future__ import absolute_import
 from builtins import str
 import os
-import sys
 import threading
 threading._DummyThread._Thread__stop = lambda x: 42
 import signal
@@ -30,11 +29,9 @@ from .utils.analytics_fixture import AnalyticsFixture
 from .utils.stats_fixture import StatsFixture
 from mockcassandra import mockcassandra
 import logging
-import time
 from opserver.sandesh.viz.constants import *
-from .utils.opserver_introspect_utils import VerificationOpsSrv
 from opserver.vnc_cfg_api_client import VncCfgApiClient
-from .utils.util import retry, find_buildroot
+from .utils.util import find_buildroot
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
@@ -45,9 +42,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def setUpClass(cls):
-        if StatsTest._check_skip_test() is True:
-            return
-
         if (os.getenv('LD_LIBRARY_PATH', '').find('build/lib') < 0):
             if (os.getenv('DYLD_LIBRARY_PATH', '').find('build/lib') < 0):
                 assert(False)
@@ -57,11 +51,7 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def tearDownClass(cls):
-        if StatsTest._check_skip_test() is True:
-            return
-
         mockcassandra.stop_cassandra(cls.cassandra_port)
-        pass
 
     def setUp(self):
         super(StatsTest, self).setUp()
@@ -80,8 +70,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE.
         '''
         logging.info("%%% test_00_basicsamples %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -134,8 +122,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE, using prefix-suffix indexes
         '''
         logging.info("%%% test_01_statprefix %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -198,8 +184,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE.
         '''
         logging.info("%%% test_02_overflowsamples %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -236,8 +220,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and queries aggregate functions on them
         '''
         logging.info("%%% test_03_aggregate_query %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
                              self.__class__.cassandra_port))
@@ -286,8 +268,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE, using prefix-suffix indexes
         '''
         logging.info("%%% test_04_statprefix_obj %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -330,8 +310,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE, using prefix-suffix indexes
         '''
         logging.info("%%% test_05_statprefix_double %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -373,8 +351,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if all filter operations work properly.
         '''
         logging.info("%%% test_06_stats_filter %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -455,8 +431,6 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         and checks if they can be accessed from QE.
         '''
         logging.info("%%% test_07_container_samples %%%")
-        if StatsTest._check_skip_test() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir,
@@ -518,15 +492,10 @@ class StatsTest(testtools.TestCase, fixtures.TestWithFixtures):
         cs.close()
         return cport
 
-    @staticmethod
-    def _check_skip_test():
-        if (socket.getfqdn("127.0.0.1") == 'build01'):
-            logging.info("Skipping test")
-            return True
-        return False
 
 def _term_handler(*_):
     raise IntSignal()
+
 
 if __name__ == '__main__':
     gevent.signal(signal.SIGINT,_term_handler)

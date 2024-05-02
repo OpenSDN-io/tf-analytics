@@ -13,18 +13,14 @@ import socket
 import fixtures
 import subprocess
 import uuid
-from .util import retry, get_free_port, \
-    delete_iptables_rule
+from .util import retry, get_free_port, delete_iptables_rule
 from mockredis import mockredis
-from mockstunnel import mockstunnel
 from mockkafka import mockkafka
 from mockzoo import mockzoo
 import redis
-import copy
 import os
 import json
 import gevent
-import datetime
 from fcntl import fcntl, F_GETFL, F_SETFL
 from operator import itemgetter
 from .opserver_introspect_utils import VerificationOpsSrv, \
@@ -37,7 +33,6 @@ from opserver.opserver_util import OpServerUtils
 from opserver.sandesh.alarmgen_ctrl.ttypes import UVEAlarmState
 from sandesh_common.vns.constants import NodeTypeNames, ModuleNames
 from sandesh_common.vns.ttypes import NodeType, Module
-from pysandesh.util import UTCTimestampUsec
 from pysandesh.sandesh_base import SandeshConfig
 from operator import itemgetter
 try:
@@ -224,8 +219,7 @@ class Collector(object):
 class AlarmGen(object):
     def __init__(self, collectors, kafka_port,
                  analytics_fixture, logger, zoo, is_dup=False,
-                 sandesh_config=None, redis_ssl_params={'ssl_enable':False, \
-                 'keyfile':None, 'certfile':None, 'ca_cert':None}):
+                 sandesh_config=None):
         self.collectors = collectors
         self.analytics_fixture = analytics_fixture
         self.http_port = 0
@@ -240,10 +234,7 @@ class AlarmGen(object):
         self.redis_password = None
         if self.analytics_fixture.redis_uves[0].password:
            self.redis_password = str(self.analytics_fixture.redis_uves[0].password)
-        self.redis_ssl_params = redis_ssl_params
         self.redis_query_port = str(self.analytics_fixture.redis_uves[0].port)
-        if self.redis_ssl_params['ssl_enable']:
-            self.redis_query_port = str(self.analytics_fixture.stunnel_obj[0].stunnel_port)
     # end __init__
 
     def set_sandesh_config(self, sandesh_config):
@@ -269,17 +260,16 @@ class AlarmGen(object):
                 '--http_server_port', str(self.http_port),
                 '--log_file', self._log_file,
                 '--log_level', 'SYS_DEBUG',
-                '--redis_server_port', self.redis_query_port]
+                '--redis_server_port', self.redis_query_port,
+                # fake rabbitmq data to not spam logs with exceptions
+                '--rabbitmq_server_list', '127.0.0.1',
+                '--rabbitmq_port', '5432']
         if self.kafka_port:
             args.append('--kafka_broker_list')
             args.append(socket.getfqdn("127.0.0.1") + ':' + str(self.kafka_port))
         args.append('--redis_uve_list')
-        if self.redis_ssl_params['ssl_enable'] is False:
-            for redis_uve in self.analytics_fixture.redis_uves:
-                args.append(socket.getfqdn("127.0.0.1")+':'+str(redis_uve.port))
-        else:
-            for stunnel_obj in self.analytics_fixture.stunnel_obj:
-                args.append(socket.getfqdn("127.0.0.1")+':'+str(stunnel_obj.stunnel_port))
+        for redis_uve in self.analytics_fixture.redis_uves:
+            args.append(socket.getfqdn("127.0.0.1")+':'+str(redis_uve.port))
         args.append('--collectors')
         for collector in self.collectors:
             args.append(collector)
@@ -322,15 +312,6 @@ class AlarmGen(object):
                 self.sandesh_config['disable_object_logs']:
                 args.append('--disable_object_logs')
 
-        if self.redis_ssl_params['ssl_enable']:
-            args.append('--redis_use_ssl')
-            args.append('--redis_keyfile')
-            args.append(self.redis_ssl_params['keyfile'])
-            args.append('--redis_certfile')
-            args.append(self.redis_ssl_params['certfile'])
-            args.append('--redis_ca_cert')
-            args.append(self.redis_ssl_params['ca_cert'])
-
         self._logger.info('Setting up AlarmGen: %s' % ' '.join(args))
         ports, self._instance = \
                          self.analytics_fixture.start_with_ephemeral_ports(
@@ -365,9 +346,7 @@ class AlarmGen(object):
 class OpServer(object):
     def __init__(self, collectors, analytics_fixture, logger,
                  admin_user, admin_password, zoo=None, is_dup=False,
-                 sandesh_config=None, redis_ssl_params={'ssl_enable':False, \
-                 'keyfile':None, 'certfile':None, 'ca_cert':None},
-                 opserver_redis_ssl=True,
+                 sandesh_config=None,
                  analytics_server_ssl_params={'ssl_enable':False, \
                  'insecure_enable':False, 'keyfile':None,
                  'certfile':None, 'ca_cert':None}):
@@ -391,12 +370,7 @@ class OpServer(object):
         self.admin_user = admin_user
         self.admin_password = admin_password
         self.sandesh_config = sandesh_config
-        self.redis_ssl_params = redis_ssl_params
         self.redis_query_port = str(self.analytics_fixture.redis_uves[0].port)
-        if opserver_redis_ssl is False:
-            self.redis_ssl_params['ssl_enable'] = False
-        if self.redis_ssl_params['ssl_enable']:
-            self.redis_query_port = str(self.analytics_fixture.stunnel_obj[0].stunnel_port)
         self.analytics_server_ssl_params = analytics_server_ssl_params
     # end __init__
 
@@ -433,12 +407,8 @@ class OpServer(object):
             args.append('--redis_password')
             args.append(self.analytics_fixture.redis_uves[0].password)
         args.append('--redis_uve_list') 
-        if self.redis_ssl_params['ssl_enable'] is False:
-            for redis_uve in self.analytics_fixture.redis_uves:
-                args.append(socket.getfqdn("127.0.0.1")+':'+str(redis_uve.port))
-        else:
-            for stunnel_obj in self.analytics_fixture.stunnel_obj:
-                args.append(socket.getfqdn("127.0.0.1")+':'+str(stunnel_obj.stunnel_port))
+        for redis_uve in self.analytics_fixture.redis_uves:
+            args.append(socket.getfqdn("127.0.0.1")+':'+str(redis_uve.port))
         args.append('--collectors')
         for collector in self.collectors:
             args.append(collector)
@@ -473,15 +443,6 @@ class OpServer(object):
             if 'disable_object_logs' in self.sandesh_config and \
                 self.sandesh_config['disable_object_logs']:
                 args.append('--disable_object_logs')
-
-        if self.redis_ssl_params['ssl_enable']:
-            args.append('--redis_use_ssl')
-            args.append('--redis_keyfile')
-            args.append(self.redis_ssl_params['keyfile'])
-            args.append('--redis_certfile')
-            args.append(self.redis_ssl_params['certfile'])
-            args.append('--redis_ca_cert')
-            args.append(self.redis_ssl_params['ca_cert'])
 
         if self.analytics_server_ssl_params['ssl_enable']:
             args.append('--analytics_api_ssl_enable')
@@ -530,8 +491,7 @@ class OpServer(object):
 
 class QueryEngine(object):
     def __init__(self, collectors, analytics_fixture, logger, cluster_id='',
-                 sandesh_config=None, redis_ssl_params={'ssl_enable':False, \
-                 'keyfile':None, 'certfile':None, 'ca_cert':None}):
+                 sandesh_config=None):
         self.collectors = collectors
         self.analytics_fixture = analytics_fixture
         self.listen_port = AnalyticsFixture.get_free_port()
@@ -550,10 +510,7 @@ class QueryEngine(object):
                             ':'+ModuleNames[Module.QUERY_ENGINE]+':0'
         self.cluster_id = cluster_id
         self.sandesh_config = sandesh_config
-        self.redis_ssl_params = redis_ssl_params
         self.redis_query_port = str(self.analytics_fixture.redis_uves[0].port)
-        if self.redis_ssl_params['ssl_enable']:
-            self.redis_query_port = str(self.analytics_fixture.stunnel_obj[0].stunnel_port)
     # end __init__
 
     def set_sandesh_config(self, sandesh_config):
@@ -621,16 +578,6 @@ class QueryEngine(object):
                 self.sandesh_config['disable_object_logs']:
                 args.append('--SANDESH.disable_object_logs')
 
-        if self.redis_ssl_params['ssl_enable']:
-            args.append('--REDIS.redis_ssl_enable')
-            args.append(str(self.redis_ssl_params['ssl_enable']))
-            args.append('--REDIS.redis_keyfile')
-            args.append(self.redis_ssl_params['keyfile'])
-            args.append('--REDIS.redis_certfile')
-            args.append(self.redis_ssl_params['certfile'])
-            args.append('--REDIS.redis_ca_cert')
-            args.append(self.redis_ssl_params['ca_cert'])
-
         self._logger.info('Setting up contrail-query-engine: %s' % ' '.join(args))
         ports, self._instance = \
                          self.analytics_fixture.start_with_ephemeral_ports(
@@ -653,6 +600,7 @@ class QueryEngine(object):
             #assert(rcode == 0)
             self._instance = None
     # end stop
+
 
 # end class QueryEngine
 class Redis(object):
@@ -678,31 +626,6 @@ class Redis(object):
 
 # end class Redis
 
-class Stunnel(object):
-    def __init__(self, builddir, redis_port, redis_ssl_params):
-        self.builddir = builddir
-        self.stunnel_port = AnalyticsFixture.get_free_port()
-        self.redis_port = redis_port
-        self.redis_ssl_params = redis_ssl_params
-        self.running = False
-    # end __init__
-
-    def start(self):
-        assert(self.running == False)
-        self.running = True
-        ret = mockstunnel.start_stunnel(self.stunnel_port, self.redis_port,
-                                   self.redis_ssl_params['keyfile'],
-                                   self.redis_ssl_params['certfile'])
-        return(ret)
-
-    # end start
-    def stop(self):
-        if self.running:
-            mockstunnel.stop_stunnel(self.stunnel_port)
-            self.running =  False
-    #end stop
-
-# end class Stunnel
 
 class Kafka(object):
     def __init__(self, zk_port):
@@ -726,6 +649,7 @@ class Kafka(object):
             self.running =  False
     #end stop
 # end class Kafka
+
 
 class Zookeeper(object):
     def __init__(self, zk_port=None):
@@ -754,6 +678,7 @@ class Zookeeper(object):
         self.running = False
     # end stop
 # end class Zookeeper
+
 
 class AnalyticsFixture(fixtures.Fixture):
     ADMIN_USER = 'test'
@@ -785,9 +710,7 @@ class AnalyticsFixture(fixtures.Fixture):
                  noqed=False, collector_ha_test=False,
                  redis_password=None, start_kafka=False,
                  cassandra_user=None, cassandra_password=None, cluster_id="",
-                 sandesh_config=None, redis_ssl_params={'ssl_enable':False, \
-                 'keyfile':None, 'certfile':None, 'ca_cert':None},
-                 opserver_redis_ssl=True,
+                 sandesh_config=None,
                  analytics_server_ssl_params={'ssl_enable':False, \
                  'insecure_enable':False, 'keyfile':None,
                  'certfile':None, 'ca_cert':None}):
@@ -809,8 +732,6 @@ class AnalyticsFixture(fixtures.Fixture):
         self.admin_user = AnalyticsFixture.ADMIN_USER
         self.admin_password = AnalyticsFixture.ADMIN_PASSWORD
         self.cluster_id = cluster_id
-        self.redis_ssl_params = redis_ssl_params
-        self.opserver_redis_ssl = opserver_redis_ssl
         self.set_sandesh_config(sandesh_config)
         self.analytics_server_ssl_params = analytics_server_ssl_params
 
@@ -820,11 +741,6 @@ class AnalyticsFixture(fixtures.Fixture):
         self.redis_uves = [Redis(self.builddir,
                                  self.redis_password)]
         self.redis_uves[0].start()
-
-        self.stunnel_obj = [Stunnel(self.builddir, self.redis_uves[0].port,
-                                    self.redis_ssl_params)]
-        if self.redis_ssl_params['ssl_enable']:
-            self.stunnel_obj[0].start()
 
         self.zookeeper = Zookeeper()
         self.zookeeper.start()
@@ -869,8 +785,6 @@ class AnalyticsFixture(fixtures.Fixture):
                                  self, self.logger, self.admin_user,
                                  self.admin_password, zkport,
                                  sandesh_config=self.sandesh_config,
-                                 redis_ssl_params=self.redis_ssl_params,
-                                 opserver_redis_ssl=self.opserver_redis_ssl,
                                  analytics_server_ssl_params= \
                                  self.analytics_server_ssl_params)
         if not self.opserver.start():
@@ -880,8 +794,7 @@ class AnalyticsFixture(fixtures.Fixture):
         if self.kafka is not None:
             self.alarmgen = AlarmGen(self.get_collectors(), self.kafka.port,
                                      self, self.logger, zkport,
-                                     sandesh_config=self.sandesh_config,
-                                     redis_ssl_params=self.redis_ssl_params)
+                                     sandesh_config=self.sandesh_config)
             if not self.alarmgen.start():
                 self.logger.error("AlarmGen did NOT start")
 
@@ -889,8 +802,7 @@ class AnalyticsFixture(fixtures.Fixture):
             self.query_engine = QueryEngine(self.get_collectors(),
                                             self, self.logger,
                                             cluster_id=self.cluster_id,
-                                            sandesh_config=self.sandesh_config,
-                                            redis_ssl_params=self.redis_ssl_params)
+                                            sandesh_config=self.sandesh_config)
             if not self.query_engine.start():
                 self.logger.error("QE did NOT start")
     # end setUp
@@ -3473,8 +3385,6 @@ class AnalyticsFixture(fixtures.Fixture):
             collector.stop()
         for redis_uve in self.redis_uves:
             redis_uve.stop()
-        for stunnel_obj in self.stunnel_obj:
-            stunnel_obj.stop()
         if self.kafka is not None:
             self.kafka.stop()
         self.zookeeper.stop()

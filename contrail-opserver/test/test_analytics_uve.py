@@ -13,7 +13,6 @@
 from __future__ import absolute_import
 from builtins import range
 import os
-import sys
 import threading
 threading._DummyThread._Thread__stop = lambda x: 42
 import signal
@@ -29,15 +28,11 @@ from .utils.util import obj_to_dict, find_buildroot, \
      add_iptables_rule, delete_iptables_rule
 from .utils.analytics_fixture import AnalyticsFixture
 from .utils.generator_fixture import GeneratorFixture
-from mockzoo import mockzoo
 import logging
 import time
 from opserver.sandesh.viz.constants import *
 from opserver.sandesh.viz.constants import _OBJECT_TABLES
 from opserver.vnc_cfg_api_client import VncCfgApiClient
-from sandesh_common.vns.ttypes import Module
-from sandesh_common.vns.constants import ModuleNames
-import platform
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
@@ -48,7 +43,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def setUpClass(cls):
-
         if (os.getenv('LD_LIBRARY_PATH', '').find('build/lib') < 0):
             if (os.getenv('DYLD_LIBRARY_PATH', '').find('build/lib') < 0):
                 assert(False)
@@ -366,9 +360,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         '''
         logging.info("%%% test_06_alarmgen_basic %%%")
 
-        if AnalyticsUveTest._check_skip_kafka() is True:
-            return True
-
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir, 0,
             start_kafka = True))
@@ -489,9 +480,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         '''
         logging.info('%%% test_07_alarm %%%')
 
-        if AnalyticsUveTest._check_skip_kafka() is True:
-            return True
-
         # collector_ha_test flag is set to True, because we wanna test
         # retrieval of alarms across multiple redis servers.
         vizd_obj = self.useFixture(
@@ -603,9 +591,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         in the UVE/Alarm GET and POST methods.
         '''
         logging.info('%%% test_08_uve_alarm_filter %%%')
-
-        if AnalyticsUveTest._check_skip_kafka() is True:
-            return True
 
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir, 0,
@@ -1893,9 +1878,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         '''
         logging.info('%%% test_09_uve_timestamp %%%')
 
-        if AnalyticsUveTest._check_skip_kafka() is True:
-            return True
-
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir, 0,
                 collector_ha_test=True, start_kafka = True))
@@ -2091,9 +2073,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         '''
         logging.info('%%% test_12_uve_get_alarm %%%')
 
-        if AnalyticsUveTest._check_skip_kafka() is True:
-            return True
-
         vizd_obj = self.useFixture(
             AnalyticsFixture(logging, builddir, 0, start_kafka = True))
         assert vizd_obj.verify_on_setup()
@@ -2184,87 +2163,6 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         assert(vizd_obj.verify_get_alarms(None, exp_uves = expected_uves,
 	    contains_=True))
     # end test_12_uve_get_alarm
-
-    #@unittest.skip('Skipping redis_ssl_basic_wrong_cacert test')
-    def test_13_redis_ssl_basic_wrong_cacert(self):
-        '''
-        This test starts redis,vizd,opserver and qed in
-        SSL enabled environment.
-        Then it checks that the opserver is not able to 
-        connect to redis if wrong SSL cacerts are provided
-        '''
-        logging.info("%%% test_13_redis_ssl_basic_wrong_cacert %%%")
-        redis_ssl_params = {
-            'keyfile': builddir+'/opserver/test/data/ssl/server-privkey.pem',
-            'certfile': builddir+'/opserver/test/data/ssl/server.pem',
-            'ca_cert': builddir+'/opserver/test/data/ssl/server.pem',
-            'ssl_enable': True
-        }
-
-        vizd_obj = self.useFixture(
-            AnalyticsFixture(logging, builddir, 0, redis_ssl_params=redis_ssl_params))
-        assert vizd_obj.verify_on_setup()
-        assert vizd_obj.verify_opserver_redis_uve_connection(
-                            vizd_obj.opserver, False)
-
-    # end test_13_redis_ssl_basic_wrong_cacert
-
-    #@unittest.skip('Skipping redis_ssl_basic_correct_cacert test')
-    def test_14_redis_ssl_basic_correct_cacert(self):
-        '''
-        This test starts redis,vizd,opserver and qed in
-        SSL enabled environment.
-        Then it checks that the opserver is able to 
-        connect to redis if correct SSL cacerts are provided
-        '''
-        logging.info("%%% test_14_redis_ssl_basic_correct_cacert  %%%")
-        redis_ssl_params = {
-            'keyfile': builddir+'/opserver/test/data/ssl/server-privkey.pem',
-            'certfile': builddir+'/opserver/test/data/ssl/server.pem',
-            'ca_cert': builddir+'/opserver/test/data/ssl/ca-cert.pem',
-            'ssl_enable': True
-        }
-
-        vizd_obj = self.useFixture(
-            AnalyticsFixture(logging, builddir, 0, redis_ssl_params=redis_ssl_params))
-        assert vizd_obj.verify_on_setup()
-        assert vizd_obj.verify_opserver_redis_uve_connection(
-                            vizd_obj.opserver)
-
-    # end test_14_redis_ssl_basic_correct_cacert
-
-    #@unittest.skip('Skipping redis_ssl_verify_uve test')
-    def test_15_redis_ssl_verify_vm_uve(self):
-        '''
-        This test starts redis,vizd,opserver and qed in
-        SSL enabled environment.
-        Then it checks that the VM UVE can be accessed
-        from opserver via redis using stunnel
-        '''
-        logging.info("%%% test_15_redis_ssl_verify_vm_uve %%%")
-        redis_ssl_params = {
-            'keyfile': builddir+'/opserver/test/data/ssl/server-privkey.pem',
-            'certfile': builddir+'/opserver/test/data/ssl/server.pem',
-            'ca_cert': builddir+'/opserver/test/data/ssl/ca-cert.pem',
-            'ssl_enable': True
-        }
-
-        vizd_obj = self.useFixture(
-            AnalyticsFixture(logging, builddir, 0, redis_ssl_params=redis_ssl_params))
-        assert vizd_obj.verify_on_setup()
-        collectors = [vizd_obj.get_collector()]
-        generator_obj = self.useFixture(
-            GeneratorFixture("contrail-vrouter-agent", collectors,
-                             logging, vizd_obj.get_opserver_port()))
-        assert generator_obj.verify_on_setup()
-        generator_obj.send_vm_uve(vm_id='abcd',
-                                  num_vm_ifs=5,
-                                  msg_count=5)
-        assert generator_obj.verify_vm_uve(vm_id='abcd',
-                                           num_vm_ifs=5,
-                                           msg_count=5)
-
-    # end test_15_redis_ssl_verify_vm_uve
 
     #@unittest.skip('Skipping analytics_ssl_params ssl_enable set as true')
     def test_16_analytics_ssl_params_ssl_enable_true(self):
@@ -2554,20 +2452,10 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         cs.close()
         return cport
 
-    @staticmethod
-    def _check_skip_kafka():
-      
-        (PLATFORM, VERSION, EXTRA) = platform.linux_distribution()
-        if PLATFORM.lower() == 'ubuntu':
-            if VERSION.find('12.') == 0:
-                return True
-        if PLATFORM.lower() == 'centos':
-            if VERSION.find('6.') == 0:
-                return True
-        return False
 
 def _term_handler(*_):
     raise IntSignal()
+
 
 if __name__ == '__main__':
     gevent.signal(signal.SIGINT,_term_handler)

@@ -10,15 +10,13 @@ from builtins import str
 import sys
 vizdtestdir = sys.path[0]
 
-import urllib.request, urllib.error, urllib.parse
-import xmltodict
 import json
 import requests
 import socket
-from lxml import etree
 from opserver.introspect_util import *
 from .opserver_results import *
 from opserver.opserver_util import OpServerUtils
+
 
 class VerificationOpsSrvIntrospect (IntrospectUtilBase):
     def __init__(self, ip, port):
@@ -49,6 +47,7 @@ class VerificationOpsSrvIntrospect (IntrospectUtilBase):
         xpath = '/RedisUVEResponse/redis_uve_info'
         p = self.dict_get(path)
         return EtreeToDict(xpath).get_all_entry(p)
+
 
 class VerificationOpsSrv (IntrospectUtilBase):
     def __init__(self, ip, port=8181, user='test',
@@ -211,6 +210,7 @@ class VerificationOpsSrv (IntrospectUtilBase):
             print(str(e))
         finally:
             return res
+
 
 if __name__ == '__main__':
     vns = VerificationOpsSrv(socket.getfqdn("127.0.0.1"))

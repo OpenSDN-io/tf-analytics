@@ -180,7 +180,6 @@ for file in test_sources:
 util_sources = [
     '../contrail-collector/test/utils/mockkafka',
     '../contrail-collector/test/utils/mockredis',
-    '../contrail-collector/test/utils/mockstunnel',
     '../contrail-collector/test/utils/mockcassandra',
     '../contrail-collector/test/utils/mockzoo',
 ]

@@ -14,17 +14,14 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import object
 import os
-import sys
 from gevent import monkey; monkey.patch_all()
 import subprocess
-import shutil
 import glob
 import unittest
 import testtools
 import fixtures
 import socket
 from .utils.analytics_fixture import AnalyticsFixture
-from .utils.generator_fixture import GeneratorFixture
 from .utils.opserver_introspect_utils import VerificationOpsSrv
 from mockcassandra import mockcassandra
 import logging
@@ -54,9 +51,6 @@ class cd(object):
 class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
     @classmethod
     def setUpClass(cls):
-        if AnalyticsTest._check_skip_test() == True:
-            return
-
         if (os.getenv('LD_LIBRARY_PATH','').find('build/lib') < 0):
             if (os.getenv('DYLD_LIBRARY_PATH','').find('build/lib') < 0):
                 assert(False)
@@ -68,10 +62,7 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
 
     @classmethod
     def tearDownClass(cls):
-        if AnalyticsTest._check_skip_test() == True:
-            return
         mockcassandra.stop_cassandra(cls.cassandra_port)
-        pass
 
     @unittest.skip('Skipping test_00_startup performance test')
     def test_00_startup(self):
@@ -81,8 +72,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         The idea is to use this to monitor/improve qed performance
         '''
         logging.info("%%% test_00_startup %%%")
-        if AnalyticsTest._check_skip_test() == True:
-            return True
 
         vizd_obj = self.useFixture(AnalyticsFixture(logging, \
             builddir, self.__class__.cassandra_port, True))
@@ -182,13 +171,6 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
         cport = cs.getsockname()[1]
         cs.close() 
         return cport
-
-    @staticmethod 
-    def _check_skip_test():
-        if (socket.getfqdn("127.0.0.1") == 'build01'):
-            logging.info("Skipping test")
-            return True
-        return False
 
     @staticmethod
     def _load_data_into_cassandra(cassandra_port):
