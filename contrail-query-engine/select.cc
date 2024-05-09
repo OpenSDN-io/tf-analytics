@@ -14,6 +14,7 @@
 #include <analytics/viz_constants.h>
 #include <contrail-collector/vizd_table_desc.h>
 #include "utils.h"
+#include "stats_query.h"
 #include "stats_select.h"
 
 using contrail::regex;

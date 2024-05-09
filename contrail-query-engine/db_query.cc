@@ -5,6 +5,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/foreach.hpp>
 #include "query.h"
+#include "stats_query.h"
 #include "base/work_pipeline.h"
 
 /*
@@ -284,8 +285,8 @@ void DbQueryUnit::WPCompleteCb(QEPipeT *wp, bool ret_code) {
 void DbQueryUnit::cb(GenDb::DbOpResult::type dresult,
                      std::auto_ptr<GenDb::ColList> column_list,
                      GetRowInput * get_row_ctx, void * privdata) {
-    std::auto_ptr<q_result> q_result_ptr(new q_result);
-    std::auto_ptr<GetRowInput>  gri(get_row_ctx);
+    std::unique_ptr<q_result> q_result_ptr(new q_result);
+    std::unique_ptr<GetRowInput>  gri(get_row_ctx);
     uint32_t t2;
     uint8_t session_type = 0;
     uint8_t is_si = 0;
@@ -312,7 +313,7 @@ void DbQueryUnit::cb(GenDb::DbOpResult::type dresult,
             qe->stable_stats_.Update(m_query->stat_name_attr, false, true,
                 false, 1);
        }
-       rpi->Response(q_result_ptr);
+       rpi->Response(std::move(q_result_ptr));
        return;
     }
     // Update the reads against the stat
@@ -428,7 +429,7 @@ void DbQueryUnit::cb(GenDb::DbOpResult::type dresult,
     if (privdata) {
         ExternalProcIf<q_result> * rpi(
             reinterpret_cast<ExternalProcIf<q_result> *>(privdata));
-        rpi->Response(q_result_ptr);
+        rpi->Response(std::move(q_result_ptr));
     }
 
 }

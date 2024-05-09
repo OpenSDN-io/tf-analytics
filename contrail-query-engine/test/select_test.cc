@@ -5,6 +5,7 @@
 #include "testing/gunit.h"
 
 #include "query.h"
+#include "stats_query.h"
 #include "analytics_query_mock.h"
 #include <boost/uuid/uuid.hpp>
 

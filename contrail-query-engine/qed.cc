@@ -25,6 +25,7 @@
 #include "nodeinfo_types.h"
 #include "options.h"
 #include "query.h"
+#include "stats_query.h"
 #include "qe_sandesh.h"
 #include <base/misc_utils.h>
 #include <query_engine/buildinfo.h>
@@ -32,7 +33,7 @@
 #include <io/process_signal.h>
 #include <malloc.h>
 
-using std::auto_ptr;
+using std::unique_ptr;
 using std::string;
 using std::vector;
 using std::map;

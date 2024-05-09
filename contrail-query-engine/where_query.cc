@@ -1365,7 +1365,7 @@ void WhereQuery::subquery_processed(QueryUnit *subquery) {
         m_query->qperf_.chunk_where_time =
         static_cast<uint32_t>((UTCTimestampUsec() - m_query->where_start_)
         /1000);
-        where_query_cb_(m_query->handle_, m_query->qperf_, where_result_);
+        where_query_cb_(m_query->handle_, m_query->qperf_, std::auto_ptr<std::vector<query_result_unit_t>>(where_result_.release()));
         return;
     }
     if (m_query->is_message_table_query()
@@ -1377,13 +1377,13 @@ void WhereQuery::subquery_processed(QueryUnit *subquery) {
     } else if (m_query->is_stat_table_query(m_query->table())) {
         std::vector<WhereResultT*> inp_final;
         if (inp.size() != 0) {
-            std::auto_ptr<WhereResultT>
+            std::unique_ptr<WhereResultT>
                 where_result_old(new std::vector<query_result_unit_t>);
             SetOperationUnit::op_and(((AnalyticsQuery *)(this->main_query))->query_id,
                 *where_result_old, inp);
             inp_final.push_back(where_result_old.get());
         }
-        std::auto_ptr<WhereResultT>
+        std::unique_ptr<WhereResultT>
             where_result_new(new std::vector<query_result_unit_t>);
         SetOperationUnit::op_and(((AnalyticsQuery *)(this->main_query))->query_id,
             *where_result_new, inp_new_data);
@@ -1409,7 +1409,7 @@ void WhereQuery::subquery_processed(QueryUnit *subquery) {
     m_query->qperf_.chunk_where_time =
         static_cast<uint32_t>((UTCTimestampUsec() - m_query->where_start_)
         /1000);
-    where_query_cb_(m_query->handle_, m_query->qperf_, where_result_);
+    where_query_cb_(m_query->handle_, m_query->qperf_,std::auto_ptr<std::vector<query_result_unit_t>>(where_result_.release()));
 }
 
 query_status_t WhereQuery::process_query()

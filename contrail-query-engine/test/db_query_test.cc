@@ -9,6 +9,7 @@
 #include "testing/gunit.h"
 #include "base/logging.h"
 #include <query.h>
+#include <stats_query.h>
 #include <analytics_query_mock.h>
 #include "contrail-collector/db_handler.h"
 #include "contrail-collector/test/cql_if_mock.h"
@@ -63,7 +64,7 @@ bool DbQueryUnitTest::TestFailureHandling(const std::string& cfname,
              const GenDb::WhereIndexInfoVec& where_vec,
              GenDb::DbConsistency::type dconsistency,
              GenDb::GenDbIf::DbGetRowCb cb) {
-    std::auto_ptr<GetRowInput> rip(new GetRowInput());
+    std::unique_ptr<GetRowInput> rip(new GetRowInput());
     rip->rowkey = rowkey;
     std::auto_ptr<GenDb::ColList> collist;
     cb(GenDb::DbOpResult::ERROR, collist);
@@ -140,7 +141,7 @@ TEST_F(DbQueryUnitTest, ProcessQuery) {
     AnalyticsQueryMock parent;
     analytics_query_mock.parallel_batch_num = 1;
     analytics_query_mock.query_id = "abcd";
-    std::auto_ptr<QueryEngine> qe(new QueryEngine());
+    std::unique_ptr<QueryEngine> qe(new QueryEngine());
     analytics_query_mock.qe_ = qe.get();
     analytics_query_mock.qe_->max_tasks_ = 15;
 
@@ -166,7 +167,7 @@ TEST_F(DbQueryUnitTest, ProcessQueryFailure) {
     AnalyticsQueryMock parent;
     analytics_query_mock.parallel_batch_num = 1;
     analytics_query_mock.query_id = "abcd";
-    std::auto_ptr<QueryEngine> qe(new QueryEngine());
+    std::unique_ptr<QueryEngine> qe(new QueryEngine());
     analytics_query_mock.qe_ = qe.get();
     analytics_query_mock.qe_->max_tasks_ = 15;
 
@@ -191,7 +192,7 @@ TEST_F(DbQueryUnitTest, QueryFailureCallback) {
     AnalyticsQueryMock parent;
     analytics_query_mock.parallel_batch_num = 1;
     analytics_query_mock.query_id = "abcd";
-    std::auto_ptr<QueryEngine> qe(new QueryEngine());
+    std::unique_ptr<QueryEngine> qe(new QueryEngine());
     analytics_query_mock.qe_ = qe.get();
     analytics_query_mock.qe_->max_tasks_ = 15;
 
@@ -221,7 +222,7 @@ TEST_F(DbQueryUnitTest, QueryFailureCallback) {
 TEST_F(DbQueryUnitTest, WhereQueryProcessing) {
     AnalyticsQueryMock mq;
     mq.query_id = "abcd";
-    std::auto_ptr<QueryEngine> qe(new QueryEngine());
+    std::unique_ptr<QueryEngine> qe(new QueryEngine());
     mq.qe_ = qe.get();
     mq.qe_->max_tasks_ = 15;
 
@@ -298,7 +299,7 @@ TEST_F(DbQueryUnitTest, TestStatsUpdate) {
     AnalyticsQueryMock parent;
     analytics_query_mock.parallel_batch_num = 1;
     analytics_query_mock.query_id = "abcd";
-    std::auto_ptr<QueryEngine> qe(new QueryEngine());
+    std::unique_ptr<QueryEngine> qe(new QueryEngine());
     analytics_query_mock.qe_ = qe.get();
     analytics_query_mock.qe_->max_tasks_ = 15;
     analytics_query_mock.stat_name_attr = "Statattr";

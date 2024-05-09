@@ -619,7 +619,7 @@ TEST_F(DbHandlerTest, SessionTableInsertTest) {
     std::vector<std::pair<std::string, std::vector<SessionEndpoint> > >::
         const_iterator sit;
     for (sit = session_msgs.begin(); sit != session_msgs.end(); sit++) {
-        std::auto_ptr<SandeshXMLMessageTest> msg(
+        std::unique_ptr<SandeshXMLMessageTest> msg(
             dynamic_cast<SandeshXMLMessageTest *>(
                 builder_->Create(reinterpret_cast<const uint8_t *>(
                     sit->first.c_str()), sit->first.size())));

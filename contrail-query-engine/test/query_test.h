@@ -16,6 +16,7 @@
 #include "io/event_manager.h"
 #include "sandesh/sandesh_session.h"
 #include "query.h"
+#include "stats_query.h"
 #include "database/cassandra/cql/cql_if.h"
 
 class CdbIfMock : public cass::cql::CqlIf {

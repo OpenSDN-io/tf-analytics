@@ -8,6 +8,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "query.h"
+#include "stats_query.h"
 
 using boost::assign::map_list_of;
 using contrail::regex;
@@ -194,8 +195,8 @@ query_status_t PostProcessingQuery::process_query() {
     }
 
     AnalyticsQuery *mquery = (AnalyticsQuery *)main_query;
-    result_ = mquery->selectquery_->result_;
-    mresult_ = mquery->selectquery_->mresult_;
+    result_ = std::move(mquery->selectquery_->result_);
+    mresult_ = std::move(mquery->selectquery_->mresult_);
     QEOpServerProxy::BufferT *raw_result = result_.get();
 
     /* filter are ANDs over OR

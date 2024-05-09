@@ -23,6 +23,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "query.h"
+#include "stats_query.h"
 #include "analytics_types.h"
 #include "stats_select.h"
 #include <base/connection_info.h>
@@ -38,7 +39,7 @@ using boost::tuple;
 using boost::shared_ptr;
 using boost::scoped_ptr;
 using std::pair;
-using std::auto_ptr;
+using std::unique_ptr;
 using std::make_pair;
 using process::ConnectionState;
 using process::ConnectionType;
@@ -207,37 +208,37 @@ public:
 
 
     void QECallback(void * qid, QPerfInfo qperf,
-            auto_ptr<std::vector<query_result_unit_t> > res) {
+            unique_ptr<std::vector<query_result_unit_t> > res) {
 
         RawResultT* raw(new RawResultT);
         raw->perf = qperf;
-        raw->wres = res;
+        raw->wres = std::move(res);
 
         ExternalProcIf<RawResultT> * rpi = NULL;
         if (qid)
             rpi = reinterpret_cast<ExternalProcIf<RawResultT> *>(qid);
 
         if (rpi) {
-            auto_ptr<RawResultT> rp(raw);
-            rpi->Response(rp);
+            unique_ptr<RawResultT> rp(raw);
+            rpi->Response(std::move(rp));
         }
     }
 
-    void QECallback(void * qid, QPerfInfo qperf, auto_ptr<QEOpServerProxy::BufferT> res, 
-            auto_ptr<QEOpServerProxy::OutRowMultimapT> mres) {
+    void QECallback(void * qid, QPerfInfo qperf, unique_ptr<QEOpServerProxy::BufferT> res, 
+            unique_ptr<QEOpServerProxy::OutRowMultimapT> mres) {
 
         RawResultT* raw(new RawResultT);
         raw->perf = qperf;
-        raw->res = res;
-        raw->mres = mres;
+        raw->res = std::move(res);
+        raw->mres = std::move(mres);
 
         ExternalProcIf<RawResultT> * rpi = NULL;
         if (qid)
             rpi = reinterpret_cast<ExternalProcIf<RawResultT> *>(qid);
 
         if (rpi) {
-            auto_ptr<RawResultT> rp(raw);
-            rpi->Response(rp);
+            unique_ptr<RawResultT> rp(raw);
+            rpi->Response(std::move(rp));
         }
     }
    
@@ -513,7 +514,7 @@ public:
                     ret.inp = inp.inp;
                     RedisAsyncConnection * rac = conns_[ret.inp.redis_host_idx][ret.inp.cnum].get();
                     std::stringstream keystr;
-                    auto_ptr<QEOutputT> jsonresult(new QEOutputT);
+                    unique_ptr<QEOutputT> jsonresult(new QEOutputT);
 
                     QE_LOG_NOQID(INFO,  "Will Jsonify #rows " << 
                         inp.result.size() + inp.mresult.size());
@@ -1069,7 +1070,7 @@ public:
             return;
         }
 
-        auto_ptr<RedisT> fullReply;
+        unique_ptr<RedisT> fullReply;
         vector<string> elements;
 
         if (r == NULL) {
@@ -1090,12 +1091,12 @@ public:
         if (!privdata) {
             //QE_TRACE_NOQID(DEBUG, "Ignoring redis reply");
             return;
-        }      
+        }
         ExternalProcIf<RedisT> * rpi = 
                 reinterpret_cast<ExternalProcIf<RedisT> *>(privdata);
         QE_TRACE_NOQID(DEBUG,  " Rx data from REDIS for " << rpi->Key());
-                    
-        rpi->Response(fullReply);
+
+        rpi->Response(std::move(fullReply));
 
     }
 
@@ -1229,16 +1230,16 @@ QEOpServerProxy::~QEOpServerProxy() {}
 
 void
 QEOpServerProxy::QueryResult(void * qid, QPerfInfo qperf,
-        auto_ptr<BufferT> res, auto_ptr<OutRowMultimapT> mres) {
-        
-    impl_->QECallback(qid, qperf, res, mres);
+        std::auto_ptr<BufferT> res, std::auto_ptr<OutRowMultimapT> mres) {
+
+    impl_->QECallback(qid, qperf, std::unique_ptr<BufferT>(res.release()), std::unique_ptr<OutRowMultimapT>(mres.release()));
 }
 
 void
 QEOpServerProxy::QueryResult(void * qid, QPerfInfo qperf,
-        auto_ptr<std::vector<query_result_unit_t> > res) {
-        
-    impl_->QECallback(qid, qperf, res);
+        std::auto_ptr<std::vector<query_result_unit_t> > res) {
+
+    impl_->QECallback(qid, qperf, std::unique_ptr<std::vector<query_result_unit_t>>(res.release()));
 }
 
 void QEOpServerProxy::AddAnalyticsQuery(const std::string &qid,

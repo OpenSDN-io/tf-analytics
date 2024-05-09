@@ -18,12 +18,12 @@ class CqlIfMock : public cass::cql::CqlIf {
 
     bool Db_AddColumn(std::auto_ptr<GenDb::ColList> cl,
         GenDb::DbConsistency::type dconsistency,
-        GenDb::GenDbIf::DbAddColumnCb db_cb) {
+        GenDb::GenDbIf::DbAddColumnCb db_cb) override {
         return Db_AddColumnProxy(cl.get());
     }
 
     bool Db_AddColumnSync(std::auto_ptr<GenDb::ColList> cl,
-        GenDb::DbConsistency::type dconsistency) {
+        GenDb::DbConsistency::type dconsistency) override {
         return Db_AddColumnSyncProxy(cl.get());
     }
 

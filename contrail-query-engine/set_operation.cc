@@ -3,6 +3,7 @@
  */
 
 #include "query.h"
+#include "stats_query.h"
 
 using std::vector;
 using boost::shared_ptr;

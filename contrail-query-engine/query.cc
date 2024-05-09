@@ -786,8 +786,8 @@ query_status_t AnalyticsQuery::process_query()
     qperf_.chunk_postproc_time =
             static_cast<uint32_t>((UTCTimestampUsec() - postproc_start_)/1000);
 
-    final_result = postprocess_->result_;
-    final_mresult = postprocess_->mresult_;
+    final_result = std::move(postprocess_->result_);
+    final_mresult = std::move(postprocess_->mresult_);
     if (query_status != QUERY_SUCCESS)
     {
         QE_LOG(DEBUG, 
@@ -824,7 +824,7 @@ AnalyticsQuery::AnalyticsQuery(const std::string& qid, std::map<std::string,
         processing_needed(true),
         qe_(qe),
         handle_(handle),
-        stats_(NULL)
+        stats_(nullptr)
 {
     assert(dbif_ != NULL);
     // Need to do this for logging/tracing with query ids
@@ -906,7 +906,7 @@ AnalyticsQuery::AnalyticsQuery(const std::string& qid,
     processing_needed(true),
     qe_(qe),
     handle_(handle),
-    stats_(NULL) {
+    stats_(nullptr) {
     Init(qid, json_api_data, or_number);
 }
 
@@ -1253,13 +1253,13 @@ QueryEngine::QueryExecWhere(void * handle, QueryParams qp, uint32_t chunk,
     QE_TRACE_NOQID(DEBUG,
              " Got Where Query to execute for QID " << qid << " chunk:"<< chunk);
     if (cassandra_ports_.size() == 1 && cassandra_ports_[0] == 0) {
-        std::auto_ptr<std::vector<query_result_unit_t> > where_output(
+        std::unique_ptr<std::vector<query_result_unit_t> > where_output(
                 new std::vector<query_result_unit_t>());
         QE_TRACE_NOQID(DEBUG, " Finished NULL query processing for QID " << qid << " chunk:" << chunk);
         QEOpServerProxy::QPerfInfo qperf(0,0,0);
         qperf.error = 0;
 
-        qosp_->QueryResult(handle, qperf, where_output);
+        qosp_->QueryResult(handle, qperf, std::auto_ptr<std::vector<query_result_unit_t>>(where_output.release()));
         return true;
     }
     boost::shared_ptr<AnalyticsQuery> q(new AnalyticsQuery(qid, dbif_, qp.terms,
@@ -1283,7 +1283,7 @@ QueryEngine::QueryExecWhere(void * handle, QueryParams qp, uint32_t chunk,
                 static_cast<uint32_t>((UTCTimestampUsec() - q->where_start_)
                 /1000);
             q->qperf_.error = q->status_details;
-            qosp_->QueryResult(q->handle_, q->qperf_, q->wherequery_->where_result_);
+            qosp_->QueryResult(q->handle_, q->qperf_, std::auto_ptr<std::vector<query_result_unit_t>>(q->wherequery_->where_result_.release()));
         case QUERY_IN_PROGRESS:
             query_status_ = true;
             break;
@@ -1301,7 +1301,7 @@ QueryEngine::QueryExec(void * handle, QueryParams qp, uint32_t chunk,
              " Got Query to execute for QID " << qid << " chunk:"<< chunk);
     //GenDb::GenDbIf *db_if = dbif_.get();
     if (cassandra_ports_.size() == 1 && cassandra_ports_[0] == 0) {
-        std::auto_ptr<QEOpServerProxy::BufferT> final_output(new QEOpServerProxy::BufferT);
+        std::unique_ptr<QEOpServerProxy::BufferT> final_output(new QEOpServerProxy::BufferT);
         QEOpServerProxy::OutRowT outrow = boost::assign::map_list_of(
             "MessageTS", "1368037623434740")(
             "Messagetype", "IFMapString")(
@@ -1309,13 +1309,13 @@ QueryEngine::QueryExec(void * handle, QueryParams qp, uint32_t chunk,
             "Source","b1s1")(
             "ObjectLog","\n<IFMapString type=\"sandesh\"><message type=\"string\" identifier=\"1\">Cancelling Response timer.</message><file type=\"string\" identifier=\"-32768\">src/ifmap/client/ifmap_state_machine.cc</file><line type=\"i32\" identifier=\"-32767\">578</line></IFMapString>");
         QEOpServerProxy::MetadataT metadata;
-        std::auto_ptr<QEOpServerProxy::OutRowMultimapT> final_moutput(new QEOpServerProxy::OutRowMultimapT);
+        std::unique_ptr<QEOpServerProxy::OutRowMultimapT> final_moutput(new QEOpServerProxy::OutRowMultimapT);
         for (int i = 0 ; i < 100; i++)
             final_output->push_back(std::make_pair(outrow, metadata));
         QE_TRACE_NOQID(DEBUG, " Finished query processing for QID " << qid << " chunk:" << chunk);
         QEOpServerProxy::QPerfInfo qperf(0,0,0);
         qperf.error = 0;
-        qosp_->QueryResult(handle, qperf, final_output, final_moutput);
+        qosp_->QueryResult(handle, qperf, std::auto_ptr<QEOpServerProxy::BufferT>(final_output.release()), std::auto_ptr<QEOpServerProxy::OutRowMultimapT>(final_moutput.release()));
         return true;
     }
     AnalyticsQuery *q;
@@ -1327,7 +1327,7 @@ QueryEngine::QueryExec(void * handle, QueryParams qp, uint32_t chunk,
 
     QE_TRACE_NOQID(DEBUG, " Finished query processing for QID " << qid << " chunk:" << chunk);
     q->qperf_.error = q->status_details;
-    qosp_->QueryResult(handle, q->qperf_, q->final_result, q->final_mresult);
+    qosp_->QueryResult(handle, q->qperf_, std::auto_ptr<QEOpServerProxy::BufferT>(q->final_result.release()), std::auto_ptr<QEOpServerProxy::OutRowMultimapT>(q->final_mresult.release()));
     delete q;
     return true;
 }

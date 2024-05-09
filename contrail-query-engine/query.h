@@ -516,7 +516,7 @@ public:
     int32_t direction_ing;
     const std::string json_string_;
     uint32_t wterms_;
-    std::auto_ptr<WhereResultT> where_result_;
+    std::unique_ptr<WhereResultT> where_result_;
     // Used to store the sub_query(Each DbQueryUnits) results
     std::vector<WhereResultT*> inp;
     std::vector<WhereResultT*> inp_new_data;
@@ -585,10 +585,10 @@ public:
     std::string cfname;
     bool unroll_needed;
 
-    std::auto_ptr<BufT> result_;
-    std::auto_ptr<MapBufT> mresult_;
+    std::unique_ptr<BufT> result_;
+    std::unique_ptr<MapBufT> mresult_;
 
-    std::auto_ptr<StatsSelect> stats_;
+    std::unique_ptr<StatsSelect> stats_;
 
     enum fs_query_type {
         FS_SELECT_INVALID = 0x0,
@@ -782,8 +782,8 @@ public:
 
     // result after post processing
 
-    std::auto_ptr<BufT> result_;
-    std::auto_ptr<MapBufT> mresult_;
+    std::unique_ptr<BufT> result_;
+    std::unique_ptr<MapBufT> mresult_;
 
     bool sort_field_comparator(const QEOpServerProxy::ResultRowT& lhs,
                                const QEOpServerProxy::ResultRowT& rhs);
@@ -836,8 +836,8 @@ public:
     bool  filter_qe_logs;   // whether to filter query engine logs
 
     // final result of the query
-    std::auto_ptr<QEOpServerProxy::BufferT> final_result;
-    std::auto_ptr<QEOpServerProxy::OutRowMultimapT> final_mresult;
+    std::unique_ptr<QEOpServerProxy::BufferT> final_result;
+    std::unique_ptr<QEOpServerProxy::OutRowMultimapT> final_mresult;
 
     std::map<std::string, std::string> json_api_data_;
     const std::vector<query_result_unit_t> * where_info_;
@@ -928,7 +928,7 @@ const std::vector<boost::shared_ptr<QEOpServerProxy::BufferT> >& inputs,
     const StatsQuery& stats(void) const { return *stats_; }
     std::string stat_name_attr; // will be populated only for stats query
     private:
-    std::auto_ptr<StatsQuery> stats_;
+    std::unique_ptr<StatsQuery> stats_;
     // Analytics table to query
     std::string table_;
     // query start time requested by the user
