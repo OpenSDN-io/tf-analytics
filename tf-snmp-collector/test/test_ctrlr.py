@@ -15,6 +15,7 @@ import unittest
 import collections
 from collections import namedtuple
 from kafka.common import OffsetAndMessage,Message
+from gevent import signal_handler as gevent_signal
 
 
 class MockSnmpUve(mock.MagicMock):
@@ -68,5 +69,5 @@ def _term_handler(*_):
     raise IntSignal()
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGINT, _term_handler)
+    gevent_signal(signal.SIGINT, _term_handler)
     unittest.main(verbosity=2, catchbreak=True)

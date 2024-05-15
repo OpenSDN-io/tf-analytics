@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
+from past.builtins import basestring
 from builtins import str
 from builtins import range
 from past.utils import old_div
@@ -24,6 +25,7 @@ import random
 import hashlib
 from .sandesh.snmp_collector_info.ttypes import SnmpCollectorInfo, \
     SnmpCollectorUVE
+from gevent import signal_handler as gevent_signal
 
 class MaxNinTtime(object):
     def __init__(self, n, t, default=0):
@@ -61,7 +63,7 @@ class Controller(object):
         self._config.random_collectors = self._config.collectors()
         self._chksum = ""
         if self._config.collectors():
-             self._chksum = hashlib.md5("".join(self._config.collectors())).hexdigest()
+             self._chksum = hashlib.md5("".join(self._config.collectors()).encode('utf-8')).hexdigest()
              self._config.random_collectors = random.sample(self._config.collectors(), \
                                                             len(self._config.collectors()))
         if 'host_ip' in self._config._args:
@@ -318,7 +320,7 @@ class Controller(object):
                     collectors = config.get('DEFAULTS', 'collectors')
                     if isinstance(collectors, (basestring, str)):
                         collectors = collectors.split()
-                        new_chksum = hashlib.md5("".join(collectors)).hexdigest()
+                        new_chksum = hashlib.md5("".join(collectors)).encode('utf-8').hexdigest()
                         if new_chksum != self._chksum:
                             self._chksum = new_chksum
                             self._config.random_collectors = \
@@ -352,7 +354,7 @@ class Controller(object):
         """ @sighup
         SIGHUP handler to indicate configuration changes
         """
-        gevent.signal(signal.SIGHUP, self.sighup_handler)
+        gevent_signal(signal.SIGHUP, self.sighup_handler)
 
         self.gevs = [
             gevent.spawn(self._config_handler.start),

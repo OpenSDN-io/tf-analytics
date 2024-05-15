@@ -29,6 +29,7 @@ from opserver.opserver_util import camel_case_to_hyphen
 
 from cfgm_common.exceptions import *
 from contrail_alarm import alarm_list
+from gevent import signal_handler as gevent_signal
 
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(levelname)s %(message)s')
@@ -2447,5 +2448,5 @@ def _term_handler(*_):
     raise IntSignal()
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGINT, _term_handler)
+    gevent_signal(signal.SIGINT, _term_handler)
     unittest.main(verbosity=2, catchbreak=True)

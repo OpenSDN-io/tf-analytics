@@ -58,7 +58,7 @@ version = '0.2.0'               # Make this match what is in setup.py
 cd_cmd = 'cd ' + Dir('.').path + ' && '
 sdist_gen = env.Command('dist/tf_snmp_collector-' \
         + version + '.tar.gz',
-        sources + sdist_depends, cd_cmd + 'python setup.py sdist')
+        sources + sdist_depends, cd_cmd + 'python3 setup.py sdist')
 env.Alias('src/contrail-analytics/tf-snmp-collector/' + \
         'tf_snmp_collector:sdist', sdist_gen)
 
@@ -95,7 +95,7 @@ testr_str = 'bash -c "set -o pipefail && cd ' + Dir(top_dir).path + \
             ' omit_list="tf_snmp_collector/gen_py"' \
             ' build_top=' + Dir(env['TOP']).path + \
             ' CFLAGS= LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../../../build/lib' \
-            ' python setup.py run_tests %s 2>&1 |' \
+            ' python3 setup.py run_tests %s 2>&1 |' \
             ' tee %s.log"'
 
 env.Append(ENV = {'BUILDTOP': Dir(env['TOP']).abspath,
@@ -142,7 +142,7 @@ doc_files += env.SandeshGenDoc('snmp_collector_info.sandesh')
 
 if 'install' in BUILD_TARGETS:
     install_cmd = env.Command(None, sources + sdist_depends,
-                              cd_cmd + 'python setup.py install %s' %
+                              cd_cmd + 'python3 setup.py install %s' %
                               env['PYTHON_INSTALL_OPT'])
     env.Alias('install', install_cmd)
 env.Alias('install', env.Install(env['INSTALL_CONF'],

@@ -89,7 +89,7 @@ cd_cmd = 'cd ' + Dir('.').path + ' && '
 sdist_gen = OpEnv.Command(
     'dist/opserver-%s.tar.gz' % OpEnv.GetPyVersion(),
     'setup.py',
-    cd_cmd + 'python setup.py sdist')
+    cd_cmd + 'python3 setup.py sdist')
 # install everything before building distribution
 OpEnv.Depends(sdist_gen, sdist_depends)
 
@@ -108,7 +108,7 @@ alarmgen_doc_files += OpEnv.SandeshGenDoc('#src/contrail-common/sandesh/library/
 if 'install' in BUILD_TARGETS:
     install_cmd = OpEnv.Command(None,
                                 'setup.py',
-                                cd_cmd + 'python setup.py install %s' %
+                                cd_cmd + 'python3 setup.py install %s' %
                                 OpEnv['PYTHON_INSTALL_OPT'])
     OpEnv.Depends(install_cmd, sdist_depends)
     OpEnv.Alias('install', install_cmd)
@@ -229,7 +229,7 @@ testr_str = 'bash -c "set -o pipefail && cd ' + Dir(top_dir).path + \
             ' && tools_path=../config/common/tests/' + \
             ' omit_list="opserver/sandesh"' \
             ' CFLAGS= LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../../../build/lib' \
-            ' python setup.py run_tests %s 2>&1 |' \
+            ' python3 setup.py run_tests %s 2>&1 |' \
             ' tee %s.log"'
 
 OpEnv.Append(ENV = {'BUILDTOP': Dir(OpEnv['TOP']).abspath,

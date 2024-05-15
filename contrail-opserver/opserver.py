@@ -136,7 +136,7 @@ class ContrailGeventServer(bottle.GeventServer):
         super(ContrailGeventServer, self).__init__(args.rest_api_ip,
                                                    args.rest_api_port)
     def run(self, handler):
-        from gevent import wsgi as wsgi_fast, pywsgi, monkey, local, ssl
+        from gevent import pywsgi as wsgi_fast, pywsgi, monkey, local, ssl
         if self.options.get('monkey', True):
             import threading
             if not threading.local is local.local: monkey.patch_all()
