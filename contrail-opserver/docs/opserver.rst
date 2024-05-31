@@ -126,7 +126,7 @@ The following is the **HTTP POST** API related to these queries:
 
         POST data is in JSON format and is based on the following idl file.
 
-        .. include:: ../../query_engine/query_rest.idl
+        .. include:: ../../contrail-query-engine/query_rest.idl
            :literal:
 
         The result of the query API is also in JSON format.
