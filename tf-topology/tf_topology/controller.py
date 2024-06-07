@@ -58,9 +58,11 @@ class Controller(object):
         self._prouters = {}
         self._vrouter_l2ifs = {}
         self._old_vrouter_l2ifs = {}
+
+        zk_servers = self._config.zookeeper_server()
         self._config_handler = TopologyConfigHandler(self._sandesh,
             self._config.rabbitmq_params(), self._config.cassandra_params(),
-            host_ip)
+            host_ip, zk_servers)
         self.constnt_schdlr = ConsistentScheduler(self.uve._moduleid,
             zookeeper=self._config.zookeeper_server(),
             delete_hndlr=self._del_uves, logger=self._logger,

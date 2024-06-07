@@ -1051,11 +1051,15 @@ class Controller(object):
         self._uveqf = {}
         self._alarm_config_change_map = {}
 
+        # form a string of ips
+        zk_servers = ','.join(self._conf.zk_list())
+
         # Create config handler to read/update alarm config
         self._config_handler = AlarmGenConfigHandler(self._sandesh,
             self._moduleid, self._instance_id, self._conf.rabbitmq_params(),
             self._conf.cassandra_params(), self.mgrs,
-            self.alarm_config_change_callback, self._conf.host_ip())
+            self.alarm_config_change_callback, self._conf.host_ip(),
+            zk_servers)
 
         PartitionOwnershipReq.handle_request = self.handle_PartitionOwnershipReq
         PartitionStatusReq.handle_request = self.handle_PartitionStatusReq

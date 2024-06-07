@@ -85,9 +85,11 @@ class Controller(object):
         self._members = None
         self._partitions = None
         self._prouters = {}
+
+        zk_servers = self._config.zookeeper_server()
         self._config_handler = SnmpConfigHandler(self._sandesh,
             self._config.rabbitmq_params(), self._config.cassandra_params(),
-            host_ip)
+            host_ip, zk_servers)
         self._consistent_scheduler = ConsistentScheduler(self._config._name,
             zookeeper=self._config.zookeeper_server(),
             delete_hndlr=self._del_uves, logger=self._logger,

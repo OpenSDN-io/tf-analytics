@@ -20,7 +20,7 @@ from .analytics_logger import AnalyticsLogger
 
 class ConfigHandler(object):
     def __init__(self, sandesh, service_id, rabbitmq_cfg, cassandra_cfg,
-                 db_cls, reaction_map, host_ip):
+                 db_cls, reaction_map, host_ip, zk_servers):
         self._sandesh = sandesh
         self._logger = AnalyticsLogger(self._sandesh)
         self._service_id = service_id
@@ -31,6 +31,7 @@ class ConfigHandler(object):
         self._vnc_amqp = None
         self._vnc_db = None
         self.host_ip = host_ip
+        self.zk_servers = zk_servers
     # end __init__
 
     # Public methods
@@ -62,7 +63,8 @@ class ConfigHandler(object):
                 credential=cassandra_credential,
                 ssl_enabled=self._cassandra_cfg['use_ssl'],
                 ca_certs=self._cassandra_cfg['ca_certs'],
-                cassandra_driver=self._cassandra_cfg['cassandra_driver'])
+                cassandra_driver=self._cassandra_cfg['cassandra_driver'],
+                zk_servers=self.zk_servers)
         except Exception as e:
             template = 'Exception {0} connecting to Config DB. Arguments:\n{1!r}'
             msg = template.format(type(e).__name__, e.args)
