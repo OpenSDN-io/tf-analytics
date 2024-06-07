@@ -22,7 +22,7 @@ class OpserverLocalStdLog(object):
 
 class GeventPoolServer(GeventServer):    
     def run(self, handler):
-        from gevent import wsgi as wsgi_fast, pywsgi, monkey, local
+        from gevent import pywsgi as wsgi_fast, pywsgi, monkey, local
         if self.options.get('monkey', True):
             import threading
             if not threading.local is local.local: monkey.patch_all()

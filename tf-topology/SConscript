@@ -54,7 +54,7 @@ sdist_depends = [ nodeinfo_pkg, cpuinfo_pkg, process_info_pkg,
 cd_cmd = 'cd ' + Dir('.').path + ' && '
 sdist_gen = env.Command('dist/tf_topology-' \
         + version + '.tar.gz',
-        sources + src_sandesh, cd_cmd + 'python setup.py sdist')
+        sources + src_sandesh, cd_cmd + 'python3 setup.py sdist')
 env.Depends(sdist_gen, sdist_depends)
 env.Alias('src/contrail-analytics/tf-topology/' + \
         'tf_topology:sdist', sdist_gen)
@@ -92,7 +92,7 @@ testr_str = 'bash -c "set -o pipefail && cd ' + Dir(top_dir).path + \
             ' && tools_path=../config/common/tests/' + \
             ' omit_list="tf_topology/gen_py"' \
             ' CFLAGS= LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:../../../build/lib' \
-            ' python setup.py run_tests %s 2>&1 |' \
+            ' python3 setup.py run_tests %s 2>&1 |' \
             ' tee %s.log"'
 
 env.Append(ENV = {'BUILDTOP': Dir(env['TOP']).abspath,
@@ -137,7 +137,7 @@ doc_files += env.SandeshGenDoc('topology_info.sandesh')
 
 if 'install' in BUILD_TARGETS:
     install_cmd = env.Command(None, sources + src_sandesh,
-                              cd_cmd + 'python setup.py install %s' %
+                              cd_cmd + 'python3 setup.py install %s' %
                               env['PYTHON_INSTALL_OPT'])
     env.Depends(install_cmd, sdist_depends)
     env.Alias('install', install_cmd)

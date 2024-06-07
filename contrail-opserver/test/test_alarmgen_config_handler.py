@@ -22,6 +22,7 @@ from vnc_api.gen.resource_xsd import AlarmExpression, \
 from pysandesh.sandesh_logger import SandeshLogger
 from opserver.plugins.alarm_base import AlarmBase
 from opserver.alarmgen_config_handler import AlarmGenConfigHandler
+from gevent import signal_handler as gevent_signal
 
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(levelname)s %(message)s')
@@ -732,5 +733,5 @@ def _term_handler(*_):
 
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGINT, _term_handler)
+    gevent_signal(signal.SIGINT, _term_handler)
     unittest.main(verbosity=2, catchbreak=True)
