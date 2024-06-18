@@ -1,4 +1,0 @@
-[run]
-branch = True
-concurrency = gevent
-source=tf_snmp_collector

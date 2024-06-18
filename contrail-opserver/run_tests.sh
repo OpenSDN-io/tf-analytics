@@ -129,7 +129,7 @@ function run_tests {
       # provided.
       testrargs="discover ./tests"
     fi
-    ${wrapper} python -m testtools.run $testropts $testrargs
+    ${wrapper} python3 -m testtools.run $testropts $testrargs
 
     # Short circuit because all of the testr and coverage stuff
     # below does not make sense when running testtools.run for
@@ -149,7 +149,7 @@ function run_tests {
   TESTRTESTS="$TESTRTESTS --testr-args='--subunit --concurrency $concurrency $testropts $testrargs'"
   if [ setup.cfg -nt nova.egg-info/entry_points.txt ]
   then
-    ${wrapper} python setup.py egg_info
+    ${wrapper} python3 setup.py egg_info
   fi
   echo "Running \`${wrapper} $TESTRTESTS\`"
   if ${wrapper} which subunit-2to1 2>&1 > /dev/null
@@ -195,7 +195,7 @@ function run_pep8 {
 }
 
 
-TESTRTESTS="python setup.py testr"
+TESTRTESTS="python3 setup.py testr"
 
 if [ $never_venv -eq 0 ]
 then
@@ -206,21 +206,21 @@ then
   fi
   if [ $update -eq 1 ]; then
       echo "Updating virtualenv..."
-      env tools_path=${tools_path} root_path=${root_path} python ${tools_path}/tools/install_venv.py $installvenvopts
+      env tools_path=${tools_path} root_path=${root_path} python3 ${tools_path}/tools/install_venv.py $installvenvopts
   fi
   if [ -e ${venv} ]; then
     wrapper="${with_venv}"
   else
     if [ $always_venv -eq 1 ]; then
       # Automatically install the virtualenv
-      env tools_path=${tools_path} root_path=${root_path} python ${tools_path}/tools/install_venv.py $installvenvopts
+      env tools_path=${tools_path} root_path=${root_path} python3 ${tools_path}/tools/install_venv.py $installvenvopts
       wrapper="${with_venv}"
     else
       echo -e "No virtual environment found...create one? (Y/n) \c"
       read use_ve
       if [ "x$use_ve" = "xY" -o "x$use_ve" = "x" -o "x$use_ve" = "xy" ]; then
         # Install the virtualenv and run the test suite in it
-        env tools_path=${tools_path} root_path=${root_path} python ${tools_path}/tools/install_venv.py $installvenvopts
+        env tools_path=${tools_path} root_path=${root_path} python3 ${tools_path}/tools/install_venv.py $installvenvopts
         wrapper=${with_venv}
       fi
     fi

@@ -5,7 +5,6 @@
 #
 
 import os
-import sys
 
 Import('BuildEnv')
 OpEnv = BuildEnv.Clone()
@@ -132,42 +131,12 @@ OpEnv.Alias('install', OpEnv.Install(
             OpEnv['INSTALL_MESSAGE_DOC'] + '/contrail-alarm-gen/',
             alarmgen_doc_files))
 
-def clean_coverage(env, target, source):
-    # rm -rf opserver/test/test_coverage
-    import shutil
-    shutil.rmtree('test_coverage', ignore_errors = True)
-    os.system('lcov --base-directory ' + Dir('#').abspath + ' --directory ' + \
-            Dir(env['TOP']).abspath + ' --zerocounters')
-
-def run_coverage(env, target, source):
-    lcov_run = 'lcov --ignore-errors gcov,source --base-directory ' + \
-               Dir('#').abspath + ' --directory ' + Dir(env['TOP']).abspath + \
-               ' -c -o ' + Dir(env['TOP']).abspath + \
-               '/opserver/test/analytics_test_intermediate.info'
-    os.system(lcov_run)
-    lcov_run = 'lcov -e ' + Dir(env['TOP']).abspath + \
-               '/opserver/test/analytics_test_intermediate.info ' + \
-               Dir('#').abspath + '/src/contrail-analytics/contrail-collector/* ' + \
-               Dir('#').abspath + '/src/contrail-analytics/contrail-query-engine/* ' + \
-               Dir('#').abspath + '/controller/src/database/* ' + \
-               ' -o ' + Dir(env['TOP']).abspath + \
-               '/opserver/test/analytics_test.info'
-    os.system(lcov_run)
-
-    genhtml_cmd = 'genhtml -o ' + Dir(env['TOP']).abspath + \
-                  '/opserver/test/test_coverage' + \
-                  ' -t "test coverage" --num-spaces 4 ' + \
-                  Dir(env['TOP']).abspath + '/opserver/test/analytics_test.info'
-    os.system(genhtml_cmd)
-
 test_sources = [
-    'run_tests.sh',
     'requirements.txt',
     'test-requirements.txt',
     '.testr.conf',
     '.stestr.conf',
     'tox.ini',
-    '.coveragerc',
     'test',
     '../../../controller/src/config/utils/contrail_alarm.py',
     ]
@@ -232,8 +201,7 @@ testr_str = 'bash -c "set -o pipefail && cd ' + Dir(top_dir).path + \
             ' python3 setup.py run_tests %s 2>&1 |' \
             ' tee %s.log"'
 
-OpEnv.Append(ENV = {'BUILDTOP': Dir(OpEnv['TOP']).abspath,
-                    'COVERAGERUN': str(OpEnv['OPT'] == 'coverage')})
+OpEnv.Append(ENV = {'BUILDTOP': Dir(OpEnv['TOP']).abspath})
 
 pyver = OpEnv.GetPyVersion()
 test_depends = [
@@ -249,23 +217,7 @@ test_depends = [
         '/opserver/plugins/test/alarm_process_status/dist/alarm_process_status-%s.tar.gz' % pyver,
 ]
 
-if OpEnv['OPT'] == 'coverage':
-    run_test_cmd = OpEnv.Command('coveragetest.log', sdist_gen + sandesh_pkgs,
-            testr_str % ('--coverage', 'coveragetest'))
-    OpEnv.Depends(run_test_cmd, [OpEnv['TOP']+x for x in test_depends])
-    OpEnv.Depends(run_test_cmd, sdist_depends)
-    clean_coverage_cmd = OpEnv.Command('clean_coverage', '', clean_coverage)
-    OpEnv.AlwaysBuild(clean_coverage_cmd)
-    run_coverage_cmd = OpEnv.Command('run_coverage', '', run_coverage)
-    OpEnv.Depends(run_coverage_cmd, run_test_cmd[0].name)
-    OpEnv.Depends(run_coverage_cmd, 'analytics-test')
-    OpEnv.Depends(run_coverage_cmd, 'qe-test')
-    OpEnv.Depends(run_coverage_cmd, 'gendb_test_suite')
-    OpEnv.Depends(run_coverage_cmd, 'thriftif_test_suite')
-    OpEnv.Depends(run_test_cmd, clean_coverage_cmd[0].name)
-    OpEnv.AlwaysBuild(run_coverage_cmd)
-    test_cmd = run_coverage_cmd
-elif OpEnv['PYTESTARG']:
+if OpEnv['PYTESTARG']:
     test_cmd = OpEnv.Command(OpEnv['PYTESTARG'] + '.log',
             sdist_gen + sandesh_pkgs,
             testr_str % ('--testrun="%s"' % (OpEnv['PYTESTARG']),
