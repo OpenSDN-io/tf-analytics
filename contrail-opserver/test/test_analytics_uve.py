@@ -11,12 +11,8 @@
 #
 
 from __future__ import absolute_import
-from builtins import range
 import os
-import threading
-threading._DummyThread._Thread__stop = lambda x: 42
 import signal
-import gevent
 from gevent import monkey
 monkey.patch_all()
 import unittest
