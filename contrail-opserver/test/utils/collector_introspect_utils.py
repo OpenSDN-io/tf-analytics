@@ -10,7 +10,6 @@
 # Python generator introspect utils
 #
 
-from lxml import etree
 from opserver.introspect_util import *
 
 

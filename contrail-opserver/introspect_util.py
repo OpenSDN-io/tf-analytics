@@ -3,20 +3,15 @@
 #
 
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+
 import urllib.request, urllib.parse, urllib.error
-import xmltodict
 import json
 import requests
 from lxml import etree
-import socket
 from requests.auth import HTTPBasicAuth
 
-class JsonDrv (object):
 
+class JsonDrv (object):
     def load(self, url, user, password, cert, ca_cert, headers):
         try:
             if user and password:
@@ -30,8 +25,8 @@ class JsonDrv (object):
             print("Socket Connection error : " + str(e))
             return None
 
-class XmlDrv (object):
 
+class XmlDrv (object):
     def load(self, url, user, password, cert, ca_cert, headers):
         try:
             if user and password:
