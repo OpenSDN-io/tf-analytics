@@ -10,21 +10,11 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import str
-from builtins import range
-from builtins import object
+
 from gevent import monkey
 monkey.patch_all()
-try:
-    from collections import OrderedDict
-except ImportError:
-    # python 2.6 or earlier, use backport
-    from ordereddict import OrderedDict
+
 from collections import namedtuple
-TableSchema = namedtuple("TableSchema", ("name", "datatype", "index", "suffixes"))
 from .uveserver import UVEServer
 import math
 import sys
@@ -92,6 +82,9 @@ from .sandesh.analytics_api_info.ttypes import AnalyticsApiInfoUVE, \
     UVEDbCacheUveRequest, UVEDbCacheUveResponse
 from cfgm_common.exceptions import BadRequest, HttpError, PermissionDenied, AuthFailed
 from .opserver_util import convert_to_string
+
+
+TableSchema = namedtuple("TableSchema", ("name", "datatype", "index", "suffixes"))
 
 
 _ERRORS = {
