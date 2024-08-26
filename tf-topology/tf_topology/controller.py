@@ -412,7 +412,7 @@ class Controller(object):
 
     def sighup_handler(self):
         if self._config._args.conf_file:
-            config = configparser.SafeConfigParser()
+            config = configparser.SafeConfigParser(strict=False)
             config.read(self._config._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

@@ -118,7 +118,7 @@ class CfgParser(object):
 
         config = None
         if args.conf_file:
-            config = configparser.SafeConfigParser()
+            config = configparser.SafeConfigParser(strict=False)
             config.optionxform = str
             config.read(args.conf_file)
             if 'DEFAULTS' in config.sections():
