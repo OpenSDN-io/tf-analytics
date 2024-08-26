@@ -1126,7 +1126,7 @@ class OpServer(object):
         # read contrail-analytics-api own conf file
         config = None
         if args.conf_file:
-            config = configparser.SafeConfigParser()
+            config = configparser.SafeConfigParser(strict=False)
             config.read(args.conf_file)
             if 'DEFAULTS' in config.sections():
                 defaults.update(dict(config.items("DEFAULTS")))
@@ -2657,7 +2657,7 @@ class OpServer(object):
 
     def sighup_handler(self):
         if self._args.conf_file:
-            config = configparser.SafeConfigParser()
+            config = configparser.SafeConfigParser(strict=False)
             config.read(self._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

@@ -2614,7 +2614,7 @@ class Controller(object):
 
     def sighup_handler(self):
         if self._conf._args.conf_file:
-            config = configparser.SafeConfigParser()
+            config = configparser.SafeConfigParser(strict=False)
             config.read(self._conf._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

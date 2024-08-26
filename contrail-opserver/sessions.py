@@ -116,7 +116,7 @@ class SessionQuerier(object):
         if args.conf_file:
             configfile = args.conf_file
 
-        config = configparser.SafeConfigParser()
+        config = configparser.SafeConfigParser(strict=False)
         config.read(configfile)
         if 'KEYSTONE' in config.sections():
             if args.admin_user == None:
