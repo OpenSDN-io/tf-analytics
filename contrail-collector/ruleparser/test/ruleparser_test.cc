@@ -1,7 +1,11 @@
 /*
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
-
+// Careful: must include globals first for extern definitions
+#include <signal.h>
+#undef _POSIX_C_SOURCE
+#undef _XOPEN_SOURCE
+#include <boost/python.hpp>
 #include <cassert>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,9 +21,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <limits.h>
-// Careful: must include globals first for extern definitions
+
 #include <boost/scoped_array.hpp>
-#include <boost/python.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include "../ruleutil.h"
 #include "../t_ruleparser.h"

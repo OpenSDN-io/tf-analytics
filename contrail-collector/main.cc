@@ -2,14 +2,16 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
-#include <fstream>
-
+#include <signal.h>
+#undef _POSIX_C_SOURCE
+#undef _XOPEN_SOURCE
+#include <boost/python.hpp>
 #include <boost/program_options.hpp>
 #include <boost/tokenizer.hpp>
+
 #include <malloc.h>
 #include "options.h"
 #include <analytics/viz_constants.h>
-#include "boost/python.hpp"
 #include "base/logging.h"
 #include "base/contrail_ports.h"
 #include "base/task.h"
@@ -31,9 +33,10 @@
 #include "generator.h"
 #include <base/misc_utils.h>
 #include <analytics/buildinfo.h>
-#include "boost/python.hpp"
 #include <io/process_signal.h>
 #include "config_client_collector.h"
+
+#include <fstream>
 
 using namespace std;
 using namespace boost::asio::ip;

@@ -72,7 +72,7 @@ class SyslogParserTestHelper : public SyslogParser
 class SyslogMsgGen : public UdpServer
 {
   public:
-    explicit SyslogMsgGen(boost::asio::io_service *io_service, int snd_port) :
+    explicit SyslogMsgGen(boost::asio::io_context *io_service, int snd_port) :
                 UdpServer(io_service) {
         boost::system::error_code ec;
         ep_ = udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1",

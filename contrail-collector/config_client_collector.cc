@@ -8,13 +8,15 @@ ConfigClientCollector::ConfigClientCollector(EventManager *evm,
                                              std::string hostname, 
                                              std::string module_name, 
                                              Options &options) {
+    ConfigStaticObjectFactory::LinkImpl<ConfigJsonParserBase,
+        ConfigJsonParserCollector>();
+    config_client_.reset(new ConfigClientManager(evm,
+        ConfigStaticObjectFactory::Create<ConfigJsonParserBase>(),
+        hostname,
+        module_name,
+        options.configdb_options()));
 
-    ConfigFactory::Register<ConfigJsonParserBase>(
-                          boost::factory<ConfigJsonParserCollector *>());
-    config_client_.reset(new ConfigClientManager(evm, hostname,
-                            module_name, options.configdb_options()));
-
-    options.set_config_client_manager(config_client_);
+    options.set_config_client_manager(config_client_.get());
 }
 
 ConfigClientCollector::~ConfigClientCollector() {

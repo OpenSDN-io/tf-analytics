@@ -18,6 +18,7 @@
 using std::string;
 using std::vector;
 
+const int RedisAsyncConnection::RedisReconnectTime;
 RedisAsyncConnection::RAC_CbFnsMap RedisAsyncConnection::rac_cb_fns_map_;
 tbb::mutex RedisAsyncConnection::rac_cb_fns_map_mutex_;
 

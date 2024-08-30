@@ -28,7 +28,7 @@ public:
     void RegisterConfigReceive(std::string name, ConfigRxCallback cb);
     void UnRegisterConfigReceive(std::string name, ConfigRxCallback cb);
 private:
-    boost::shared_ptr<ConfigClientManager> config_client_;
+    boost::scoped_ptr<ConfigClientManager> config_client_;
 };
 
 class ConfigJsonParserCollector : public ConfigJsonParserBase {
