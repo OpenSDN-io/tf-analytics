@@ -238,7 +238,7 @@ public:
     }
     const bool api_server_use_ssl() const { return api_server_use_ssl_; }
 
-    void set_config_client_manager(boost::shared_ptr<ConfigClientManager> mgr) {
+    void set_config_client_manager(ConfigClientManager* mgr) {
         config_client_manager_ = mgr;
     }
 
@@ -319,7 +319,7 @@ private:
     DbWriteOptions db_write_options_;
 
     uint32_t configdb_chksum_;
-    boost::shared_ptr<ConfigClientManager> config_client_manager_;
+    ConfigClientManager* config_client_manager_;
     ConfigClientOptions configdb_options_;
 };
 

@@ -13,8 +13,8 @@ import shutil
 
 Import('BuildEnv')
 AnalyticsEnv = BuildEnv.Clone()
-if sys.platform != 'darwin':
-    AnalyticsEnv.CppDisableExceptions()
+#if sys.platform != 'darwin':
+#    AnalyticsEnv.CppDisableExceptions()
 
 # get appropriate python lib
 import subprocess
@@ -38,10 +38,9 @@ AnalyticsEnv.Append(LIBS=['boost_python', python])
 def MapBuildDir(dirs):
     return list(map(lambda x: '#/' + Dir('.').path + '/../' + x, dirs))
 
-etcd_incl = os.environ.get('CONTRAIL_ETCD_INCL');
-
-if etcd_incl:
-    AnalyticsEnv.Prepend(LIBS = ['etcdql', 'protobuf', 'grpc++', 'grpc', 'z'])
+#etcd_incl = os.environ.get('CONTRAIL_ETCD_INCL');
+#if etcd_incl:
+#    AnalyticsEnv.Prepend(LIBS = ['etcdql', 'protobuf', 'grpc++', 'grpc', 'z'])
 
 AnalyticsEnv.Prepend(LIBS=['cpuinfo',
         'io',
