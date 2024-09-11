@@ -98,8 +98,13 @@ class Controller(object):
             }
             try:
                 self.vrouters[vr]['l2_if'] = d['VRouterL2IfInfo']['if_info']
-            except KeyError:
-                pass
+            except KeyError as e:
+                self._logger.warn(
+                    f"Failed to retrieve vRouter data for {vr}: {str(e)}"
+                )
+                self._logger.warn(
+                    f"Warn:\n{traceback.format_exc()}"
+                )
             for ip in d['VrouterAgent']['self_ip_list']:
                 self.vrouter_ips[ip] = vr # index
             for intf in d['VrouterAgent']['phy_if']:
@@ -345,8 +350,13 @@ class Controller(object):
                                 if not vrouter_l2ifs[vr_name]:
                                     del vrouter_l2ifs[vr_name]
                                 continue
-                        except KeyError:
-                            pass
+                        except KeyError as e:
+                            self._logger.warn(
+                                f"Key {str(e)} not found while processing ARP entry for IP {arp['ip']} and MAC {arp['mac']}"
+                            )
+                            self._logger.warn(
+                                f"Warn:\n{traceback.format_exc()}"
+                            )
                         if ifm[arp['localIfIndex']].startswith('vlan'):
                             continue
                         if ifm[arp['localIfIndex']].startswith('irb'):
@@ -428,7 +438,12 @@ class Controller(object):
                         self.uve.sandesh_reconfig_collectors(
                                 self._config.random_collectors)
                 except configparser.NoOptionError as e:
-                    pass
+                    self._logger.warn(
+                        f"Option 'collectors' not found in the DEFAULTS section: {str(e)}"
+                    )
+                    self._logger.warn(
+                        f"Warn:\n{traceback.format_exc()}"
+                    )
     # end sighup_handler
 
     def _uve_scanner(self):

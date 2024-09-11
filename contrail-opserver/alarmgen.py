@@ -360,12 +360,22 @@ class AlarmProcessor(object):
     def _compare_operand_vals(self, val1, val2, operation):
         try:
             val1 = json.loads(val1)
-        except (TypeError, ValueError):
-            pass
+        except (TypeError, ValueError) as e:
+            self._logger.warn(
+                f"Failed to parse val1 as JSON: {str(e)}"
+            )
+            self._logger.warn(
+                f"Warn:\n{traceback.format_exc()}"
+            )
         try:
             val2 = json.loads(val2)
-        except (TypeError, ValueError):
-            pass
+        except (TypeError, ValueError) as e:
+            self._logger.warn(
+                f"Failed to parse val2 as JSON: {str(e)}"
+            )
+            self._logger.warn(
+                f"Warn:\n{traceback.format_exc()}"
+            )
         if operation == '==':
             return val1 == val2
         elif operation == '!=':
@@ -2497,9 +2507,12 @@ class Controller(object):
                 self._lredis.exists(self._moduleid + ':' + self._instance_id)
                 return self._lredis
             except Exception as e:
-                # It may happen new collector list does not contain the earlier
-                # connected redis, as it became down
-                pass
+                self._logger.warn(
+                    f"Failed to connect to Redis instance at {redis_ip}: {str(e)}"
+                )
+                self._logger.warn(
+                    f"Warn:\n{traceback.format_exc()}"
+                )
         while True:
             try:
                 redis_ip = socket.gethostbyname(redis_ip_list[idx])
@@ -2630,12 +2643,22 @@ class Controller(object):
                         self._sandesh.reconfig_collectors(
                             self._conf.random_collectors)
                 except configparser.NoOptionError as e:
-                    pass
+                    self._logger.warn(
+                        f"Option 'collectors' not found in the configuration file: {str(e)}"
+                    )
+                    self._logger.warn(
+                        f"Warn:\n{traceback.format_exc()}"
+                    )
             if 'REDIS' in config.sections():
                 try:
                     new_redis_list = config.get('REDIS', 'redis_uve_list')
-                except configparser.NoOptionError:
-                    pass
+                except configparser.NoOptionError as e:
+                    self._logger.warn(
+                        f"Option 'redis_uve_list' not found in the REDIS section: {str(e)}"
+                    )
+                    self._logger.warn(
+                        f"Warn:\n{traceback.format_exc()}"
+                    )
                 else:
                     redis_uve_list = []
                     for redis_uve in new_redis_list.split():

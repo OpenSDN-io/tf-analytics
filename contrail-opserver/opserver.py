@@ -29,6 +29,7 @@ import socket
 import struct
 import signal
 import random
+import traceback
 import hashlib
 import errno
 import copy
@@ -2663,7 +2664,8 @@ class OpServer(object):
                 try:
                     collectors = config.get('DEFAULTS', 'collectors')
                 except configparser.NoOptionError as e:
-                    pass
+                    self.logger.warn(f"Option 'collectors' not found in DEFAULTS: {str(e)}")
+                    self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
                     if isinstance(collectors, six.string_types):
                         collectors = collectors.split()
@@ -2676,16 +2678,15 @@ class OpServer(object):
                 try:
                     api_servers = config.get('DEFAULTS', 'api_server')
                 except configparser.NoOptionError as e:
-                    pass
+                    self.logger.warn(f"Option 'api_server' not found in DEFAULTS: {str(e)}")
+                    self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
                     if isinstance(api_servers, six.string_types):
                         api_servers = api_servers.split()
-                    new_api_server_checksum = hashlib.md5((''.join(
-                        api_servers)).encode()).hexdigest()
+                    new_api_server_checksum = hashlib.md5((''.join(api_servers)).encode()).hexdigest()
                     if new_api_server_checksum != self._api_server_checksum:
                         self._api_server_checksum = new_api_server_checksum
-                        random_api_servers = random.sample(api_servers,
-                            len(api_servers))
+                        random_api_servers = random.sample(api_servers, len(api_servers))
                         if self._vnc_api_client_connect:
                             self.gevs.remove(self._vnc_api_client_connect)
                             if not self._vnc_api_client_connect.ready():
@@ -2693,13 +2694,15 @@ class OpServer(object):
                         if self._vnc_api_client:
                             self._vnc_api_client_connect = gevent.spawn(
                                 self._vnc_api_client.update_api_servers,
-                                    random_api_servers)
+                                random_api_servers
+                            )
                             self.gevs.append(self._vnc_api_client_connect)
             if 'REDIS' in config.sections():
                 try:
                     new_redis_list = config.get('REDIS', 'redis_uve_list')
-                except configparser.NoOptionError:
-                    pass
+                except configparser.NoOptionError as e:
+                    self.logger.warn(f"Option 'redis_uve_list' not found in REDIS: {str(e)}")
+                    self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
                     redis_uve_list = []
                     for redis_uve in new_redis_list.split():
@@ -2711,7 +2714,8 @@ class OpServer(object):
                 try:
                     new_dscp_value = config.get('SANDESH', 'sandesh_dscp_value')
                 except configparser.NoOptionError as e:
-                    pass
+                    self.logger.warn(f"Option 'sandesh_dscp_value' not found in SANDESH: {str(e)}")
+                    self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
                     if new_dscp_value == self._dscp_value :
                         # dscp value has not changed, hence return
