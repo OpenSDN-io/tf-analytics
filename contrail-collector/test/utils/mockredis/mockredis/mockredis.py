@@ -32,10 +32,9 @@ redis_exe = redis_bdir + '/bin/redis-server'
 def install_redis():
     if not os.path.exists(redis_bdir):
         output,_ = call_command_("mkdir " + redis_bdir)
-
     if not os.path.exists(redis_url):
         process = subprocess.Popen(['wget', '-P', redis_bdir,
-                                    'https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/redis/redis-'\
+                                    'https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/redis/redis-'\
                                     + redis_ver + '.tar.gz'],
                                    cwd=redis_bdir)
         process.wait()

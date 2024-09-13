@@ -41,8 +41,8 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
     if not os.path.exists(cassandra_bdir):
         call_command_("mkdir " + cassandra_bdir)
 
-    cassandra_download = 'wget -P ' + cassandra_bdir + ' http://archive.apache.org/dist/cassandra/'+\
-        cassandra_version+'/apache-cassandra-'+cassandra_version+'-bin.tar.gz'
+    cassandra_download = 'wget -P ' + cassandra_bdir + ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/'+\
+        'apache-cassandra-'+cassandra_version+'-bin.tar.gz'
 
     if not os.path.exists(cassandra_url):
         process = subprocess.Popen(cassandra_download.split(' '))
