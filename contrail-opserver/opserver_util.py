@@ -8,12 +8,6 @@
 # Utility functions for Operational State Server for VNC
 #
 
-from __future__ import print_function
-from builtins import zip
-from builtins import next
-from builtins import str
-from builtins import range
-from past.builtins import basestring
 from builtins import object
 from gevent import monkey
 import os
@@ -268,8 +262,8 @@ class AnalyticsDiscovery(gevent.Greenlet):
                         self._pendingcb = set()
                         for wk in pending_list:
                             if self._data_watchers[wk]:
-                                self._data_watchers[wk](\
-                                        sorted(self._wchildren[wk].values()))
+                                self._data_watchers[wk](
+                                    self._wchildren[wk].values())
 
                     # If a reconnect happens during processing, don't lose it
                     while self._reconnect:
@@ -309,7 +303,7 @@ class AnalyticsDiscovery(gevent.Greenlet):
                                     "Analytics Discovery %s ChildData : child %s, data %s, event %s" % \
                                     (wk, elem, self._wchildren[wk][elem], "GET"))
                             if self._data_watchers[wk]:
-                                self._data_watchers[wk](sorted(self._wchildren[wk].values()))
+                                self._data_watchers[wk](self._wchildren[wk].values())
 
                     gevent.sleep(self._freq)
                 except gevent.GreenletExit:
@@ -795,7 +789,7 @@ class OpServerUtils(object):
     @staticmethod
     def _messages_dict_eval(messages_dict):
         for key, value in messages_dict.items():
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 # First try json.loads
                 success, json_value = OpServerUtils._json_loads_check(value)
                 if success:

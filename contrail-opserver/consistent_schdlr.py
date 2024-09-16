@@ -1,10 +1,6 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import object
 try:
     from consistent_hash import ConsistentHash
 except ImportError:
