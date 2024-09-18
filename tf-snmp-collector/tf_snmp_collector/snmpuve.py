@@ -1,12 +1,7 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import print_function
-from builtins import str
-from builtins import map
-from past.builtins import basestring
-from builtins import object
-import pprint, socket, copy
+import socket
 import datetime
 from pysandesh.sandesh_base import *
 from pysandesh.connection_info import ConnectionState
@@ -19,10 +14,9 @@ from sandesh.prouter.ttypes import ArpTable, IfTable, IfXTable, IfStats, \
          LldpTable, PRouterEntry, PRouterUVE, PRouterFlowEntry, \
          PRouterFlowUVE, IfIndexOperStatusTable, LldpLocPortEntry
 from .sandesh.nodeinfo.ttypes import NodeStatusUVE, NodeStatus
-from sandesh_common.vns.ttypes import Module, NodeType
-from sandesh_common.vns.constants import ModuleNames, CategoryNames,\
-     ModuleCategoryMap, Module2NodeType, NodeTypeNames, ModuleIds,\
-     INSTANCE_ID_DEFAULT
+from sandesh_common.vns.ttypes import Module
+from sandesh_common.vns.constants import ModuleNames,\
+     Module2NodeType, NodeTypeNames
 from pysandesh.gen_py.process_info.ttypes import ConnectionType,\
     ConnectionStatus
 
@@ -83,7 +77,7 @@ class SnmpUve(object):
     def conn_state_notify(self, svc, msg='', up=True, servers=''):
         ctype = self.map_svc(svc)
         status = self.map_sts(up)
-        if isinstance(servers, basestring):
+        if isinstance(servers, str):
             servers = [servers]
         ConnectionState.update(conn_type=ctype, name='SNMP', status=status,
                 message=msg, server_addrs=servers)

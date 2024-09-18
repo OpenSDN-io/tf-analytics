@@ -1,19 +1,13 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import absolute_import
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
-from builtins import str
-from builtins import range
-from past.utils import old_div
-from builtins import object
-from gevent.queue import Queue as GQueue
 from gevent.lock import Semaphore
-import os, json, sys, subprocess, time, gevent, socket
-from tempfile import NamedTemporaryFile, mkdtemp
+import os
+import subprocess
+import time
+import gevent
+import socket
+from tempfile import mkdtemp
 import pickle as pickle
 from .snmpuve import SnmpUve
 from opserver.consistent_schdlr import ConsistentScheduler
@@ -207,8 +201,8 @@ class Controller(object):
         else:
             self._sleep_time = self._config.frequency()
         self._fast_scan_freq = self._config.fast_scan_freq()
-        if self._fast_scan_freq > old_div(self._sleep_time, 2):
-            self._fast_scan_freq = old_div(self._sleep_time, 2)
+        if self._fast_scan_freq > (self._sleep_time // 2):
+            self._fast_scan_freq = (self._sleep_time // 2)
         return self._sleep_time
 
     def _setup_io(self):
@@ -320,7 +314,7 @@ class Controller(object):
             if 'DEFAULTS' in config.sections():
                 try:
                     collectors = config.get('DEFAULTS', 'collectors')
-                    if isinstance(collectors, (basestring, str)):
+                    if isinstance(collectors, str):
                         collectors = collectors.split()
                         new_chksum = hashlib.md5("".join(collectors)).encode('utf-8').hexdigest()
                         if new_chksum != self._chksum:

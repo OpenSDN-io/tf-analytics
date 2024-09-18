@@ -2,21 +2,12 @@
 # Copyright (c) 2017 Juniper Networks, Inc. All rights reserved.
 #
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 import argparse, os, sys, re
 from six.moves import configparser
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
 from sandesh_common.vns.constants import SERVICE_ALARM_GENERATOR, \
     ServicesDefaultConfigurationFiles
-
-try:
-  basestring
-except NameError:
-  basestring = str
 
 ALARMGEN_REDIS_AGGREGATE_DB_BASE_INDEX = 7
 
@@ -236,17 +227,17 @@ class CfgParser(object):
             help="Cassandra Driver")
         SandeshConfig.add_parser_arguments(parser)
         self._args = parser.parse_args(remaining_argv)
-        if isinstance(self._args.collectors, (basestring, str)):
+        if isinstance(self._args.collectors, str):
             self._args.collectors = self._args.collectors.split()
-        if isinstance(self._args.kafka_broker_list, (basestring, str)):
+        if isinstance(self._args.kafka_broker_list, str):
             self._args.kafka_broker_list= self._args.kafka_broker_list.split()
-        if isinstance(self._args.zk_list, (basestring, str)):
+        if isinstance(self._args.zk_list, str):
             self._args.zk_list= self._args.zk_list.split()
-        if isinstance(self._args.redis_uve_list, (basestring, str)):
+        if isinstance(self._args.redis_uve_list, str):
             self._args.redis_uve_list = self._args.redis_uve_list.split()
-        if isinstance(self._args.alarmgen_list, (basestring, str)):
+        if isinstance(self._args.alarmgen_list, str):
             self._args.alarmgen_list = self._args.alarmgen_list.split()
-        if isinstance(self._args.config_db_server_list, (basestring, str)):
+        if isinstance(self._args.config_db_server_list, str):
             self._args.config_db_server_list = \
                 self._args.config_db_server_list.split()
         self._args.conf_file = args.conf_file

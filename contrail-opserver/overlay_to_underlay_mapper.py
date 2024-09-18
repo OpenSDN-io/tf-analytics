@@ -8,9 +8,6 @@
 # Utility to get the Underlay information for the Overlay flow(s).
 #
 
-from __future__ import absolute_import
-from builtins import str
-from builtins import object
 import json
 
 from .sandesh.viz.constants import *

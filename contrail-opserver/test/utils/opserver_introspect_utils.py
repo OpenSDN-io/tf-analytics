@@ -2,11 +2,6 @@
 # Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
 import sys
 vizdtestdir = sys.path[0]
 

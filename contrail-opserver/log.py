@@ -10,15 +10,6 @@
 # Query log messages from analytics
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-from past.utils import old_div
-import sys
 from six.moves import configparser
 import argparse
 import json
@@ -659,8 +650,7 @@ class LogQuerier(object):
         for messages_dict in messages_dict_list:
             if TIMESTAMP in messages_dict:
                 message_dt = datetime.datetime.fromtimestamp(
-                    old_div(int(messages_dict[TIMESTAMP]),
-                    OpServerUtils.USECS_IN_SEC))
+                    int(messages_dict[TIMESTAMP]) // OpServerUtils.USECS_IN_SEC)
                 message_dt += datetime.timedelta(
                     microseconds=
                     (int(messages_dict[TIMESTAMP]) %

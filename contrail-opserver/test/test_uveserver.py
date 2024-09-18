@@ -10,20 +10,13 @@
 # Unit Tests for UVE Aggregation in Operational State Server
 #
 
-from builtins import str
-from past.builtins import basestring
-from builtins import object
 import logging
-import os
-import sys
 import copy
 import unittest
-import pdb
 import json
 
 from opserver.uveserver import UVEServer
 from opserver.uveserver import ParallelAggregator
-from opserver.opserver_util import OpServerUtils
 
 
 logging.basicConfig(level=logging.INFO,
@@ -36,7 +29,7 @@ class RedisMock(object):
 def MakeBasic(typ, val, aggtype=None):
     item = {}
     item['@type'] = typ
-    if isinstance(val, basestring):
+    if isinstance(val, str):
         item['#text'] = val
     else:
         item['#text'] = str(val)
@@ -132,7 +125,7 @@ def MakeStringMap(inmap):
     for elem in list(inmap.keys()):
         result['map']['element'].append(elem)
         result['map']['element'].append(inmap[elem])
-        if isinstance(elem,basestring):
+        if isinstance(elem, str):
             keytype = 'string'
         else:
             keytype = 'i32'

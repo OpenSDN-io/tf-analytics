@@ -1,8 +1,3 @@
-from builtins import range
-from builtins import object
-import abc
-from collections import namedtuple
-
 class AlarmBase(object):
     """Base class for Alarms
     """
@@ -83,12 +78,3 @@ class AlarmBase(object):
             if self._config.id_perms.enable is not None:
                 return self._config.id_perms.enable
         return True
-
-    #def __call__(self, uve_key, uve_data):
-        """Evaluate whether alarm should be raised.
-        Implement this method if you want to override the generic
-        alarm processing engine.
-        :param uve_key: Key of the UVE (a string)
-        :param uve_data: UVE Contents
-        :returns: list of AlarmAndList
-        """

@@ -2,12 +2,6 @@
 # Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
 #
 
-from __future__ import absolute_import
-from __future__ import division
-from builtins import str
-from builtins import range
-from past.utils import old_div
-from builtins import object
 import resource
 import socket
 import fixtures
@@ -2058,7 +2052,7 @@ class AnalyticsFixture(fixtures.Fixture):
             session_type = "client",
             filter='vrouter=%s' % vrouter)
         diff_t = int(et) - int(st)
-        num_records = (old_div(diff_t,gms)) + bool(diff_t%gms)
+        num_records = ((diff_t // gms)) + bool(diff_t%gms)
         assert(len(res) == num_records)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
@@ -2096,7 +2090,7 @@ class AnalyticsFixture(fixtures.Fixture):
             filter='vrouter=%s' % vrouter,
             session_type = "client")
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,gms)) + bool(diff_t%gms)
+        num_ts = ((diff_t // gms)) + bool(diff_t%gms)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
         ts_list = [res_start_time + (x * gms) \
@@ -2136,7 +2130,7 @@ class AnalyticsFixture(fixtures.Fixture):
             filter="vrouter=%s" % (vrouter),
             session_type="client")
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,gms)) + bool(diff_t%gms)
+        num_ts = ((diff_t // gms)) + bool(diff_t%gms)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
         ts = [res_start_time + (x * gms) \
@@ -2270,7 +2264,7 @@ class AnalyticsFixture(fixtures.Fixture):
         assert(len(res) == 6)
 
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,gms)) + bool(diff_t%gms)
+        num_ts = ((diff_t // gms)) + bool(diff_t%gms)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
         ts_list = [res_start_time + (x * gms) \
@@ -2428,7 +2422,7 @@ class AnalyticsFixture(fixtures.Fixture):
         exp_sum_pkts = {}
         for i in range(generator_obj.flow_cnt*generator_obj.flow_cnt):
             sport = 32747 + i*10
-            dport = 100 + old_div(i,3)
+            dport = 100 + (i // 3)
             if sport not in exp_sum_bytes:
                 exp_sum_bytes[sport] = {}
             exp_sum_bytes[sport][dport] = generator_obj.forward_flows[i].sampled_bytes
@@ -2436,7 +2430,7 @@ class AnalyticsFixture(fixtures.Fixture):
                 exp_sum_pkts[sport] = {}
             exp_sum_pkts[sport][dport] = generator_obj.forward_flows[i].sampled_pkts
         for i in range(generator_obj.flow_cnt*generator_obj.flow_cnt):
-            sport = 100 + old_div(i,3)
+            sport = 100 + (i // 3)
             dport = 32747 + i*10
             if sport not in exp_sum_bytes:
                 exp_sum_bytes[sport] = {}
@@ -2494,7 +2488,7 @@ class AnalyticsFixture(fixtures.Fixture):
             where_clause='sourcevn=domain1:admin:vn2 ' +
             'AND destvn=domain1:admin:vn1 AND vrouter=%s'% vrouter)
         diff_t = int(et) - int(st)
-        num_records = (old_div(diff_t,(10*1000*1000))) + bool(diff_t%(10*1000*1000))
+        num_records = ((diff_t // (10*1000*1000))) + bool(diff_t%(10*1000*1000))
         #assert(len(res) == num_records)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
@@ -2530,7 +2524,7 @@ class AnalyticsFixture(fixtures.Fixture):
                            'SUM(packets)'],
             where_clause='vrouter=%s'% vrouter)
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,(10*1000*1000))) + bool(diff_t%(10*1000*1000))
+        num_ts = ((diff_t // (10*1000*1000))) + bool(diff_t%(10*1000*1000))
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
         ts = [res_start_time + (x * 10*1000*1000) for x in range(num_records)]
@@ -2618,7 +2612,7 @@ class AnalyticsFixture(fixtures.Fixture):
                            'sport', 'dport'],
             where_clause='vrouter=%s'% vrouter)
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,gms)) + bool(diff_t%gms)
+        num_ts = ((diff_t // gms)) + bool(diff_t%gms)
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)
         ts = [res_start_time + (x * gms) for x in range(num_records)]
@@ -2664,7 +2658,7 @@ class AnalyticsFixture(fixtures.Fixture):
             where_clause='sourcevn=domain1:admin:vn1' +
             'AND destvn=domain1:admin:vn2')
         diff_t = int(et) - int(st)
-        num_ts = (old_div(diff_t,(10*1000*1000))) + bool(diff_t%(10*1000*1000))
+        num_ts = ((diff_t // (10*1000*1000))) + bool(diff_t%(10*1000*1000))
         ts = []
         res_start_time = generator_obj.session_start_time - \
                             (generator_obj.session_start_time % gms)

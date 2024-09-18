@@ -8,17 +8,6 @@
 # Operational State Server for VNC
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-from future import standard_library
-from future.utils import iteritems, python_2_unicode_compatible
-standard_library.install_aliases()
-from builtins import next
-from builtins import str
-from builtins import range
-from builtins import object
-from past.utils import old_div
 from gevent import monkey
 monkey.patch_all()
 import sys
@@ -32,11 +21,7 @@ import random
 import hashlib
 import logging
 from six.moves import configparser
-try:
-    from collections import OrderedDict
-except ImportError:
-    # python 2.6 or earlier, use backport
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 from pysandesh.sandesh_base import *
 from pysandesh.connection_info import ConnectionState
 from pysandesh.sandesh_logger import SandeshLogger
@@ -50,18 +35,18 @@ from .sandesh.nodeinfo.ttypes import NodeStatusUVE, NodeStatus
 from .sandesh.nodeinfo.cpuinfo.ttypes import *
 from .sandesh.nodeinfo.process_info.ttypes import *
 from sandesh_common.vns.ttypes import Module, NodeType
-from sandesh_common.vns.constants import ModuleNames, CategoryNames,\
-     ModuleCategoryMap, Module2NodeType, NodeTypeNames, ModuleIds,\
-     INSTANCE_ID_DEFAULT, ALARM_GENERATOR_SERVICE_NAME, \
+from sandesh_common.vns.constants import ModuleNames, \
+     Module2NodeType, NodeTypeNames, \
+     ALARM_GENERATOR_SERVICE_NAME, \
      COLLECTOR_DISCOVERY_SERVICE_NAME
 from .alarmgen_cfg import CfgParser
 from .uveserver import UVEServer
-from .partition_handler import PartitionHandler, UveStreamProc
+from .partition_handler import UveStreamProc
 from .alarmgen_config_handler import AlarmGenConfigHandler, _INVERSE_UVE_MAP
 from .sandesh.alarmgen_ctrl.ttypes import PartitionOwnershipReq, \
     PartitionOwnershipResp, PartitionStatusReq, UVECollInfo, UVEGenInfo, \
     PartitionStatusResp, UVETableAlarmReq, UVETableAlarmResp, \
-    AlarmgenTrace, UVEKeyInfo, UVETypeCount, UVETypeInfo, AlarmgenStatusTrace, \
+    UVEKeyInfo, UVETypeCount, UVETypeInfo, AlarmgenStatusTrace, \
     AlarmgenStatus, AlarmgenStats, AlarmgenPartitionUVE, \
     AlarmgenPartition, AlarmgenPartionInfo, AlarmgenUpdate, \
     UVETableInfoReq, UVETableInfoResp, UVEObjectInfo, UVEStructInfo, \
@@ -75,14 +60,9 @@ from .opserver_util import AnalyticsDiscovery
 from stevedore import hook, extension
 from pysandesh.util import UTCTimestampUsec
 from libpartition.libpartition import PartitionClient
-import redis
 from collections import namedtuple
 from .strict_redis_wrapper import StrictRedisWrapper
 from kafka import common, KafkaProducer
-try:
-  basestring
-except NameError:
-  basestring = str
 
 OutputRow = namedtuple("OutputRow",["key","typ","val"])
 
@@ -108,19 +88,19 @@ class AGTabStats(object):
 
     def get_result(self):
         if self.get_n:
-            return old_div(self.get_time, self.get_n)
+            return self.get_time // self.get_n
         else:
             return 0
 
     def pub_result(self):
         if self.pub_n:
-            return old_div(self.pub_time, self.pub_n)
+            return self.pub_time // self.pub_n
         else:
             return 0
 
     def call_result(self):
         if self.call_n:
-            return old_div(self.call_time, self.call_n)
+            return self.call_time // self.call_n
         else:
             return 0
 
@@ -285,7 +265,7 @@ class AlarmProcessor(object):
             return [self._get_uve_attribute(elem, attr_list,
                     uve_path+[{'__list_element__': elem}]) \
                     for elem in tuve]
-        elif isinstance(tuve, (basestring, str)):
+        elif isinstance(tuve, str):
             try:
                 json_elem = json.loads(tuve)
             except ValueError:
@@ -2632,7 +2612,7 @@ class Controller(object):
             if 'DEFAULTS' in config.sections():
                 try:
                     collectors = config.get('DEFAULTS', 'collectors')
-                    if isinstance(collectors, (basestring, str)):
+                    if isinstance(collectors, str):
                         collectors = collectors.split()
                         new_chksum = hashlib.md5("".join(collectors).encode()).hexdigest()
                         if new_chksum != self._chksum:

@@ -1,17 +1,10 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
-from builtins import str
-from builtins import object
-import argparse, os, sys, re
+import argparse, sys
 from six.moves import configparser
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
-from .device_config import DeviceConfig
 from sandesh_common.vns.ttypes import Module
 from sandesh_common.vns.constants import ModuleNames, \
     HttpPortSnmpCollector, \
@@ -208,9 +201,9 @@ Mibs = LldpTable, ArpTable
         group.add_argument("--device-config-file",
             help="where to look for snmp credentials")
         self._args = parser.parse_args(remaining_argv)
-        if isinstance(self._args.collectors, (basestring, str)):
+        if isinstance(self._args.collectors, str):
             self._args.collectors = self._args.collectors.split()
-        if isinstance(self._args.config_db_server_list, (basestring, str)):
+        if isinstance(self._args.config_db_server_list, str):
             self._args.config_db_server_list = \
                 self._args.config_db_server_list.split()
         self._args.config_sections = config

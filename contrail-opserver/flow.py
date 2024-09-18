@@ -10,15 +10,6 @@
 # Query flow messages from analytics
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-from past.utils import old_div
-import sys
 from six.moves import configparser
 import argparse
 import json
@@ -27,7 +18,6 @@ from .sandesh.viz.constants import FlowRecordNames, FLOW_TABLE,\
         FLOW_TABLE_UUID, FLOW_TABLE_AGG_BYTES, FLOW_TABLE_AGG_PKTS
 from .sandesh.viz.ttypes import FlowRecordFields
 from .opserver_util import OpServerUtils
-import uuid
 
 
 class FlowQuerier(object):
@@ -433,8 +423,7 @@ class FlowQuerier(object):
                 setup_time = int(flow_dict[self._SETUP_TIME])
                 if setup_time != 0:
                     setup_dt = datetime.datetime.fromtimestamp(
-                        old_div(setup_time,
-                        OpServerUtils.USECS_IN_SEC))
+                        setup_time // OpServerUtils.USECS_IN_SEC)
                     setup_dt += datetime.timedelta(
                         microseconds=
                         (setup_time %
@@ -452,8 +441,7 @@ class FlowQuerier(object):
                     self._TEARDOWN_TIME])
                 if teardown_time != 0:
                     teardown_dt = datetime.datetime.fromtimestamp(
-                        old_div(teardown_time,
-                        OpServerUtils.USECS_IN_SEC))
+                        teardown_time // OpServerUtils.USECS_IN_SEC)
                     teardown_dt += datetime.timedelta(
                         microseconds=
                         (teardown_time %

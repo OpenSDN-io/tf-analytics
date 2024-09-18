@@ -1,16 +1,14 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from builtins import object
 import socket
 from pysandesh.sandesh_base import *
 from pysandesh.connection_info import ConnectionState
 from .sandesh.nodeinfo.ttypes import NodeStatusUVE, NodeStatus
 from .sandesh.link.ttypes import LinkEntry, PRouterLinkEntry, PRouterLinkUVE
-from sandesh_common.vns.ttypes import Module, NodeType
-from sandesh_common.vns.constants import ModuleNames, CategoryNames,\
-     ModuleCategoryMap, Module2NodeType, NodeTypeNames, ModuleIds,\
-     INSTANCE_ID_DEFAULT
+from sandesh_common.vns.ttypes import Module
+from sandesh_common.vns.constants import ModuleNames,\
+     Module2NodeType, NodeTypeNames
 
 class LinkUve(object):
     def __init__(self, conf):

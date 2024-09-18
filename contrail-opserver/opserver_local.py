@@ -1,16 +1,13 @@
 #
 # Copyright (c) 2016 Juniper Networks, Inc. All rights reserved.
 #
-from builtins import str
-from builtins import object
-import sys
-import gevent
 from gevent import monkey
 monkey.patch_all()
 import bottle
 import base64
 from bottle import GeventServer
 from gevent.pool import Pool
+import sys
 
 class OpserverLocalStdLog(object):
     def __init__(self, server_name, http_port):

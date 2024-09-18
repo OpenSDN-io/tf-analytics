@@ -1,9 +1,7 @@
-from builtins import range
-import sys
-import json
-import gevent
 from gevent import monkey
 monkey.patch_all()
+import sys
+import json
 
 import unittest
 from flexmock import flexmock

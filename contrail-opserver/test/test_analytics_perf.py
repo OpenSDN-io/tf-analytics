@@ -10,11 +10,9 @@
 # Copyright (c) 2013, Contrail Systems, Inc. All rights reserved.
 #
 
-from __future__ import absolute_import
-from builtins import str
-from builtins import object
+from gevent import monkey
+monkey.patch_all()
 import os
-from gevent import monkey; monkey.patch_all()
 import subprocess
 import glob
 import unittest

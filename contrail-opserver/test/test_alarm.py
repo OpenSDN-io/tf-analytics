@@ -4,12 +4,10 @@
 # Copyright (c) 2014 Juniper Networks, Inc. All rights reserved.
 #
 
-from __future__ import absolute_import
-from builtins import str
-from builtins import object
+from gevent import monkey
+monkey.patch_all()
 import gevent
 import time
-from gevent import monkey; monkey.patch_all()
 import json
 import signal
 import socket

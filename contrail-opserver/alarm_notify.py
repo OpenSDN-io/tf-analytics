@@ -10,14 +10,11 @@
 # Send Email notification for alarms based on /analytics/alarm-stream REST API
 #
 
-from __future__ import print_function
-from builtins import object
 from gevent import monkey
 monkey.patch_all()
 import time
 import json
 import argparse
-import requests
 import datetime
 import smtplib
 import getpass

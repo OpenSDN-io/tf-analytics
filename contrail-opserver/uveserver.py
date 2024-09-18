@@ -8,23 +8,13 @@
 # Operational State Server for UVEs
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import str
-from builtins import range
-from past.builtins import basestring
-from builtins import object
 import gevent
 import json
 import copy
 import xmltodict
-import redis
-import datetime
-import sys
 import socket
 from .opserver_util import OpServerUtils
 import re
-from gevent.lock import BoundedSemaphore
 from pysandesh.util import UTCTimestampUsec
 from pysandesh.connection_info import ConnectionState
 from .sandesh.viz.constants import UVE_MAP
@@ -33,8 +23,6 @@ from pysandesh.gen_py.process_info.ttypes import ConnectionType,\
 import traceback
 from collections import namedtuple
 from .strict_redis_wrapper import StrictRedisWrapper
-from kazoo.client import KazooClient
-from kazoo.client import KazooState
 from .opserver_util import convert_to_string
 
 more_than_100k = 0 
@@ -736,7 +724,7 @@ class ParallelAggregator(object):
         result['list']['@type'] = oattr[akey]['list']['@type']
         siz = 0
         for source in list(oattr.keys()):
-            if isinstance(oattr[source]['list'][sname], basestring):
+            if isinstance(oattr[source]['list'][sname], str):
                 oattr[source]['list'][sname] = [oattr[source]['list'][sname]]
             for elem in oattr[source]['list'][sname]:
                 hdelem = json.dumps(elem)

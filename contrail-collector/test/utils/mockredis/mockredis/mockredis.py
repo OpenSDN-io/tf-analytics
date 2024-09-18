@@ -11,10 +11,7 @@
 # redis must be pre-installed for this to work
 #
 
-from __future__ import print_function
-from builtins import str
 import os
-import signal
 import subprocess
 import logging
 import socket

@@ -1,9 +1,6 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import print_function
-from builtins import str
-from builtins import object
 import requests, json
 from requests.exceptions import ConnectionError
 from requests.auth import HTTPBasicAuth

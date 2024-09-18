@@ -11,8 +11,6 @@
 # It uses mock zookeeper provided by config 
 #
     
-from __future__ import print_function
-from builtins import str
 import os
 import os.path
 import subprocess

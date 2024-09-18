@@ -1,10 +1,6 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import print_function
-from builtins import map
-from builtins import range
-from builtins import object
 import struct, netsnmp, string
 
 class SnmpTable(object):

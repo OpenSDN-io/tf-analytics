@@ -10,23 +10,14 @@
 # keyspace with Thrift to ContrailAnalyticsCql keyspace with Cql
 #
 
-from __future__ import print_function
-from builtins import str
-from builtins import hex
-from builtins import range
-from builtins import object
-import uuid
 import socket
 import json
 import numpy
-import sys
-import re
 import copy
 import random
 from sandesh.viz.gendb.ttypes import DbDataType
 
 import pycassa
-from pycassa.columnfamily import ColumnFamily
 from pycassa.types import *
 from pycassa import *
 import argparse

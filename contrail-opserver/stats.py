@@ -10,19 +10,13 @@
 # Query StatsOracle info from analytics
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-import sys
-import os
 from six.moves import configparser
 import argparse
 import json
 from .opserver_util import OpServerUtils
 from .sandesh.viz.constants import _STAT_TABLES 
+
+
 class StatQuerier(object):
 
     def __init__(self):

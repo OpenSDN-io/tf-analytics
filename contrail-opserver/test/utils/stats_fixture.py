@@ -10,8 +10,6 @@
 # Python generator test fixtures
 #
 
-from __future__ import absolute_import
-from builtins import str
 from gevent import monkey
 monkey.patch_all()
 import fixtures

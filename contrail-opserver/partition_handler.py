@@ -1,17 +1,10 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import str
-from builtins import range
-from builtins import object
 from gevent import monkey
 monkey.patch_all()
 import logging
 import gevent
-from gevent.lock import BoundedSemaphore
 from kafka import KafkaConsumer, common
-from .uveserver import UVEServer
 import os
 import ast
 import json

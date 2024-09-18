@@ -1,23 +1,15 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
-from builtins import str
-from builtins import object
-import argparse, os, sys, re
+import argparse
+import sys
+import re
 from six.moves import configparser
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
-from pysandesh.connection_info import ConnectionState
-from pysandesh.gen_py.process_info.ttypes import ConnectionStatus, \
-    ConnectionType
 from sandesh_common.vns.constants import HttpPortTopology, \
     OpServerAdminPort, \
     ServicesDefaultConfigurationFiles, SERVICE_TOPOLOGY
-from sandesh_common.vns.ttypes import Module
-import traceback
 
 class CfgParser(object):
     CONF_DEFAULT_PATHS = ServicesDefaultConfigurationFiles.get(
@@ -220,11 +212,11 @@ optional arguments:
         SandeshConfig.add_parser_arguments(parser)
 
         self._args = parser.parse_args(remaining_argv)
-        if isinstance(self._args.collectors, (basestring, str)):
+        if isinstance(self._args.collectors, str):
             self._args.collectors = self._args.collectors.split()
-        if isinstance(self._args.analytics_api, (basestring, str)):
+        if isinstance(self._args.analytics_api, str):
             self._args.analytics_api = self._args.analytics_api.split()
-        if isinstance(self._args.config_db_server_list, (basestring, str)):
+        if isinstance(self._args.config_db_server_list, str):
             self._args.config_db_server_list = \
                 self._args.config_db_server_list.split()
         self._args.config_sections = config

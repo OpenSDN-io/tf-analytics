@@ -8,10 +8,9 @@
 # Utility functions for Operational State Server for VNC
 #
 
-from builtins import object
 from gevent import monkey
-import os
 monkey.patch_all()
+import os
 import datetime
 import time
 import requests
@@ -20,7 +19,6 @@ import xmltodict
 import json
 import gevent
 import socket, struct
-import copy
 import traceback
 import ast
 import re
@@ -32,17 +30,12 @@ try:
     from pysandesh.connection_info import ConnectionState
     from pysandesh.gen_py.process_info.ttypes import ConnectionStatus, \
         ConnectionType
-    from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
 except:
     class SandeshType(object):
         SYSTEM = 1
         TRACE = 4
 from requests.auth import HTTPBasicAuth
-try:
-    from collections import OrderedDict
-except ImportError:
-    # python 2.6 or earlier, use backport
-    from ordereddict import OrderedDict
+from collections import OrderedDict
 
 def enum(**enums):
     return type('Enum', (), enums)

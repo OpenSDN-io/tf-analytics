@@ -6,7 +6,6 @@
 This file contains config data model for Alarm Generator
 """
 
-from builtins import str
 from cfgm_common.vnc_db import DBBase
 
 

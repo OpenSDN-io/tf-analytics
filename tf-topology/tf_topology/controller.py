@@ -1,17 +1,8 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
-from builtins import str
-from builtins import filter
-from builtins import range
-from builtins import object
 from .analytic_client import AnalyticApiClient
-import time, socket, os
+import socket
 from .topology_uve import LinkUve
 import gevent
 from gevent.lock import Semaphore
@@ -427,7 +418,7 @@ class Controller(object):
             if 'DEFAULTS' in config.sections():
                 try:
                     collectors = config.get('DEFAULTS', 'collectors')
-                    if isinstance(collectors, (basestring, str)):
+                    if isinstance(collectors, str):
                         collectors = collectors.split()
                         new_chksum = hashlib.md5("".join(collectors).encode('utf-8')).hexdigest()
                         if new_chksum != self._chksum:
