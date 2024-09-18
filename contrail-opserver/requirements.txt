@@ -4,6 +4,10 @@ gevent
 redis>4.3
 xmltodict
 psutil>=0.6.0,!=5.5.0,!=5.5.1
-bottle
+bottle<0.13
 sseclient
 future
+cassandra-driver>=3.16,<3.27
+kafka-python==1.4.0
+kazoo == 2.7.0
+stevedore<=3.3.0

@@ -2,49 +2,13 @@
 
 import re
 import setuptools
-import os
-import distutils
-from setuptools import setup, find_packages, Command
 
-class RunTestsCommand(Command):
-    description = "Test command to run testr in virtualenv"
-    user_options = [
-        ('coverage', 'c', "Generate code coverage report"),
-        ('testrun=', None, "Run a specific test"),
-    ]
-    boolean_options = ['coverage']
-
-    def initialize_options(self):
-        self.cwd = None
-        self.coverage = False
-        self.testrun = None
-
-    def finalize_options(self):
-        self.cwd = os.getcwd()
-        if self.testrun:
-            self.announce('Running test: %s' % str(self.testrun),
-                          level=distutils.log.INFO)
-
-    def run(self):
-        logfname = 'test.log'
-        args = '-V'
-        if self.coverage:
-            logfname = 'coveragetest.log'
-            args += ' -c'
-        if self.testrun:
-            logfname = self.testrun + '.log'
-            args = self.testrun
-        os.system('./run_tests.sh %s' % args)
-        with open(logfname) as f:
-            if not re.search(r'\nOK', ''.join(f.readlines())):
-                os._exit(1)
 
 def requirements(filename):
     with open(filename) as f:
         lines = f.read().splitlines()
     c = re.compile(r'\s*#.*')
-    return ['netsnmp-python'] + list(filter(bool, map(
-        lambda y: c.sub('', y).strip(), lines)))
+    return list(filter(bool, map(lambda y: c.sub('', y).strip(), lines)))
 
 setuptools.setup(
     name='tf_snmp_collector',
@@ -66,8 +30,5 @@ setuptools.setup(
             'tf-snmp-collector = tf_snmp_collector.main:emain',
             'tf-snmp-scanner = tf_snmp_collector.scanner:main',
         ],
-    },
-    cmdclass={
-        'run_tests': RunTestsCommand,
     },
 )

@@ -1,7 +1,6 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-from __future__ import absolute_import
 from gevent import monkey
 monkey.patch_all()
 

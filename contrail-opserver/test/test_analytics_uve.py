@@ -10,7 +10,6 @@
 # UVE and Alarm tests
 #
 
-from __future__ import absolute_import
 import os
 import signal
 from gevent import monkey

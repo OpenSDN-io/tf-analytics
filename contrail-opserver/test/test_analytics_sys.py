@@ -10,7 +10,6 @@
 # System tests for analytics
 #
 
-from __future__ import absolute_import
 import os
 import signal
 from gevent import monkey

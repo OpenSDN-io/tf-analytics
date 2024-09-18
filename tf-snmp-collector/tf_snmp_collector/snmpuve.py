@@ -5,7 +5,7 @@ import socket
 import datetime
 from pysandesh.sandesh_base import *
 from pysandesh.connection_info import ConnectionState
-from sandesh.prouter.ttypes import ArpTable, IfTable, IfXTable, IfStats, \
+from .sandesh.prouter.ttypes import ArpTable, IfTable, IfXTable, IfStats, \
          IpMib, LldpSystemCapabilitiesMap, LldpLocManAddrEntry, \
          LldpLocalSystemData, LldpRemOrgDefInfoTable, \
          LldpRemOrgDefInfoTable, LldpRemOrgDefInfoEntry, \
