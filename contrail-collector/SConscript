@@ -10,6 +10,11 @@ import sys
 import platform
 import shutil
 
+try:
+    import distro
+except ImportError:
+    pass
+
 Import('BuildEnv')
 AnalyticsEnv = BuildEnv.Clone()
 #if sys.platform != 'darwin':
@@ -17,11 +22,19 @@ AnalyticsEnv = BuildEnv.Clone()
 
 # get appropriate python lib
 import subprocess
-_, error = subprocess.Popen(["python", "-V"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+try:
+    _, error = subprocess.Popen(["python", "-V"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+except FileNotFoundError:
+    error, _ = subprocess.Popen(["python3", "-V"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 if isinstance(error, bytes):
     error = error.decode()
 full_version = error.split()[1].split('.')
 python = 'python'+full_version[0]+'.'+full_version[1]
+
+if hasattr(platform, 'linux_distribution'):
+    (PLATFORM, VERSION, EXTRA) = platform.linux_distribution()
+else:
+    (PLATFORM, VERSION, EXTRA) = distro.linux_distribution()
 
 AnalyticsEnv.Append(CPPPATH = ['/usr/include/'+ python,
                                '/usr/include/librdkafka',
@@ -33,7 +46,10 @@ AnalyticsEnv.Append(CPPPATH = ['/usr/include/'+ python,
                                AnalyticsEnv['TOP'] + '/config-client-mgr',
                                AnalyticsEnv['TOP'],
                               ])
-AnalyticsEnv.Append(LIBS=['boost_python', python])
+if PLATFORM.lower() == 'rocky linux':
+    AnalyticsEnv.Append(LIBS=['boost_python39', python])
+else:
+    AnalyticsEnv.Append(LIBS=['boost_python', python])
 
 def MapBuildDir(dirs):
     return list(map(lambda x: '#/' + Dir('.').path + '/../' + x, dirs))
@@ -80,7 +96,6 @@ AnalyticsEnv.Prepend(LIBS=['cpuinfo',
         'rdkafka++',
         'rdkafka'])
 
-(PLATFORM, VERSION, EXTRA) = platform.linux_distribution()
 if PLATFORM.lower() != 'ubuntu' or (PLATFORM.lower() == 'ubuntu' and VERSION.find('16.') == 0):
     AnalyticsEnv.Prepend(LIBS=['lz4'])
 
