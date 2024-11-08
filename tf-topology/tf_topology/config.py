@@ -104,7 +104,7 @@ optional arguments:
             'config_db_password': None,
             'config_db_use_ssl': False,
             'config_db_ca_certs': None,
-            'cassandra_driver': 'thrift',
+            'cassandra_driver': 'cql',
         }
         sandesh_opts = SandeshConfig.get_default_options()
 

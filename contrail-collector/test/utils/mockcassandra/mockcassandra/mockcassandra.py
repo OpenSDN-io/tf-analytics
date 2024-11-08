@@ -69,19 +69,13 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
     js.bind(("",0))
     jport = js.getsockname()[1]
 
-    o_clients = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    o_clients.bind(("",0))
-    o_client_port = o_clients.getsockname()[1]
-
     cqlport = cport
-    thriftport = o_client_port
 
-    logging.info('Cassandra Client Port %d: CQL Port %d, Thrift Port %d' %
-        (cport, cqlport, thriftport))
+    logging.info('Cassandra Client Port %d: CQL Port %d' %
+        (cport, cqlport))
 
     replace_string_(confdir + "cassandra.yaml", \
-        [("rpc_port: 9160","rpc_port: " + str(thriftport)), \
-        ("storage_port: 7000","storage_port: " + str(sport)),
+        [("storage_port: 7000","storage_port: " + str(sport)),
         ("native_transport_port: 9042","native_transport_port: " + str(cqlport))])
 
     if cassandra_user is not None and cassandra_password is not None:
@@ -104,10 +98,9 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
         ss.close()
 
     js.close()
-    o_clients.close()
 
     call_command_(cassbase + basefile + "/bin/cassandra -R -p " + cassbase + "pid")
-    assert(verify_cassandra(thriftport, cqlport, cassandra_user, cassandra_password))
+    assert(verify_cassandra(cqlport))
 
     return cassbase, basefile
 
@@ -142,7 +135,7 @@ def replace_string_(filePath, findreplace):
     os.rename(tempName,filePath)
 
 
-def verify_cassandra(thriftport, cqlport, cassandra_user, cassandra_password):
+def verify_cassandra(cqlport):
     retry_threshold = 10
     retry = 1
     cassbase = "/tmp/cassandra.%s.%d/" % (os.getenv('USER', 'None'), cqlport)

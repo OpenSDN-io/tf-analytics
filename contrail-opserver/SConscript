@@ -40,7 +40,6 @@ local_sources = [
            'alarmgen_cfg.py',
            'partition_handler.py',
            'consistent_schdlr.py',
-           'gendb_move_tables.py',
            'alarm_notify.py',
            'config_handler.py',
            'alarmgen_config_handler.py',
