@@ -55,7 +55,6 @@ void t_ruleaction::execute(const RuleMsg& rmsg) {
             param_list.append((*iter));
         }
         main_namespace["paramlist"] = param_list;
-        main_namespace["PYTHONPATH"] = "/usr/lib/python2.7/site-packages:/Users/rajreddy/Documents/Work/Dev/ctrlplane/src/analytics/ruleeng";
 
         std::string cmdouts;
         object cmdout;

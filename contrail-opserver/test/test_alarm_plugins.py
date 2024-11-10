@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 #
 # Copyright (c) 2016 Juniper Networks, Inc. All rights reserved.
@@ -17,7 +17,7 @@ import cfgm_common.tests
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(cfgm_common.tests.__file__), "./mocked_libs")))
 
 from vnc_api.gen.resource_client import Alarm
-from vnc_api.gen.resource_xsd import IdPermsType, AlarmExpression, \
+from vnc_api.gen.resource_xsd import AlarmExpression, \
     AlarmOperand2, AlarmAndList, AlarmOrList
 from opserver.sandesh.alarmgen_ctrl.sandesh_alarm_base.ttypes import \
     AlarmOperand2 as SandeshAlarmOperand2, AlarmCondition, AlarmMatch, \

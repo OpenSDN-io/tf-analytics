@@ -1039,7 +1039,7 @@ class OpServer(object):
 
     def _parse_args(self, args_str=' '.join(sys.argv[1:])):
         '''
-        Eg. python opserver.py --host_ip 127.0.0.1
+        Eg. python3 opserver.py --host_ip 127.0.0.1
                                --redis_query_port 6379
                                --redis_password
                                --collectors 127.0.0.1:8086

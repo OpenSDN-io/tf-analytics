@@ -163,7 +163,7 @@ Example Outputs
 
 Output to get all UVE types::
 
-    root@a1s33:~# curl -q -u <user>:<password> http://localhost:8181/analytics/uves| python -mjson.tool
+    root@a1s33:~# curl -q -u <user>:<password> http://localhost:8181/analytics/uves| python3 -mjson.tool
     [
         {
             "href": "http://localhost:8181/analytics/uves/storage-pools",
@@ -269,7 +269,7 @@ Output to get all UVE types::
     
 Output to get all virtual network UVEs::
 
-    root@a1s33:~# curl -u <user>:<password> localhost:8181/analytics/uves/virtual-networks  | python -mjson.tool
+    root@a1s33:~# curl -u <user>:<password> localhost:8181/analytics/uves/virtual-networks  | python3 -mjson.tool
     [
         {
             "href": "http://localhost:8181/analytics/uves/virtual-network/default-domain:default-project:__link_local__?flat",
@@ -299,7 +299,7 @@ Output to get all virtual network UVEs::
     
 Output to get a virtual network UVE::
     
-    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/virtual-network/default-domain:admin:vn1?flat  | python -mjson.tool
+    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/virtual-network/default-domain:admin:vn1?flat  | python3 -mjson.tool
     {
         "ContrailConfig": {
             "deleted": false,
@@ -342,7 +342,7 @@ Output to get a virtual network UVE::
     
 Output to get all vrouter UVEs::
     
-    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/vrouters| python -mjson.tool
+    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/vrouters| python3 -mjson.tool
     [
         {
             "href": "http://localhost:8181/analytics/uves/vrouter/a1s34?flat",
@@ -354,7 +354,7 @@ Output to get all vrouter UVEs::
 Output to get a vrouter UVE::
     
     root@a1s33:~# 
-    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/vrouter/a1s34?flat| python -mjson.tool
+    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/uves/vrouter/a1s34?flat| python3 -mjson.tool
     {
         "ComputeCpuState": {
             "cpu_info": [
@@ -933,7 +933,7 @@ Output to get a vrouter UVE::
     
 List of all tables supported in Analytics::
     
-    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/tables| python -mjson.tool
+    root@a1s33:~# curl -u <user>:<password> http://localhost:8181/analytics/tables| python3 -mjson.tool
     [
         {
             "href": "http://localhost:8181/analytics/table/MessageTable",
@@ -1612,7 +1612,7 @@ Example of a query into message table::
     {"sort": 1, "start_time": 1366841256508546, "sort_fields": ["MessageTS"], "filter": [{"name": "Type", "value": "1", "op": 1}], "end_time": 1366841856508560, "select_fields": ["MessageTS", "Source", "ModuleId", "Category", "Messagetype", "SequenceNum", "Xmlmessage", "Type"], "table": "MessageTable", "where": [[{"name": "ModuleId", "value": "ControlNode", "op": 1}, {"name": "Messagetype", "value": "BgpPeerMessageLog", "op": 1}]]}
     [root@a3s14 ~]# 
     [root@a3s14 ~]# 
-    [root@a3s14 ~]# curl -X POST --data @filename 127.0.0.1:8081/analytics/query --header "Content-Type:application/json" | python -mjson.tool
+    [root@a3s14 ~]# curl -X POST --data @filename 127.0.0.1:8081/analytics/query --header "Content-Type:application/json" | python3 -mjson.tool
       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                      Dload  Upload   Total   Spent    Left  Speed
     100  183k  100  183k  100   431  1282k   3021 --:--:-- --:--:-- --:--:-- 1288k

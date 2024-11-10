@@ -76,7 +76,7 @@ class FlowQuerier(object):
 
     def parse_args(self):
         """
-        Eg. python flow.py --analytics-api-ip 127.0.0.1
+        Eg. python3 flow.py --analytics-api-ip 127.0.0.1
                           --analytics-api-port 8181
                           --vrouter a6s23
                           --source-vn default-domain:default-project:vn1

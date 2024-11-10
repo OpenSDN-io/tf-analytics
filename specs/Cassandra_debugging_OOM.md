@@ -35,9 +35,9 @@ By default we defined MAX_HEAP_SIZE to 8GB and HEAP_NEW_SIZE to 8GB. CMS has som
 9. df -h
 10. lscpu
 11. top -n 30 -b
-12. ulimit -a curl [http://<node-ip>:8081/analytics/alarms](http://10.84.29.4:8081/analytics/alarms) | python -mjson.tool
-13. curl [http://<node-ip>:8081/analytics/uves/analytics-node/<analytics-node-hostname>?flat](http://10.84.29.4:8081/analytics/uves/analytics-node/b7s4.englab.juniper.net?flat) | python -mjson.tool
-14. curl [http://<node-ip>:8081/analytics/uves/config-database-node/<config-node-hostname>?flat](http://10.84.29.4:8081/analytics/uves/config-database-node/b7s4.englab.juniper.net?flat) | python -mjson.tool
+12. ulimit -a curl [http://<node-ip>:8081/analytics/alarms](http://10.84.29.4:8081/analytics/alarms) | python3 -mjson.tool
+13. curl [http://<node-ip>:8081/analytics/uves/analytics-node/<analytics-node-hostname>?flat](http://10.84.29.4:8081/analytics/uves/analytics-node/b7s4.englab.juniper.net?flat) | python3 -mjson.tool
+14. curl [http://<node-ip>:8081/analytics/uves/config-database-node/<config-node-hostname>?flat](http://10.84.29.4:8081/analytics/uves/config-database-node/b7s4.englab.juniper.net?flat) | python3 -mjson.tool
 
 **Things to collect from inside cassandra docker:-**
 

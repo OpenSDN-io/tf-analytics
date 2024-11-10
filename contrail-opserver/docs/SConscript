@@ -3,7 +3,6 @@
 #
 
 # -*- mode: python; -*-
-import sys
 Import('OpEnv')
 env = OpEnv.Clone()
 

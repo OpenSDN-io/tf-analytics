@@ -2,7 +2,7 @@
 
 source /opt/contrail/analytics-venv/bin/activate
 
-python /opt/contrail/analytics/tabledump.py $*
+python3 /opt/contrail/analytics/tabledump.py $*
 ret=$?
 
 deactivate

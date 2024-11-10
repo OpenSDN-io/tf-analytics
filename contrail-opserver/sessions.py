@@ -74,7 +74,7 @@ class SessionQuerier(object):
 
     def parse_args(self):
         """
-        Eg. python sessions.py --analytics-api-ip 127.0.0.1
+        Eg. python3 sessions.py --analytics-api-ip 127.0.0.1
                           --analytics-api-port 8181
                           --table SessionSeriesTable
                           --where server_port=8080 vn=default-domain:admin:vn3

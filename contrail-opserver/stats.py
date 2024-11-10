@@ -53,7 +53,7 @@ class StatQuerier(object):
 
     def parse_args(self):
         """ 
-        Eg. python stats.py --analytics-api-ip 127.0.0.1
+        Eg. python3 stats.py --analytics-api-ip 127.0.0.1
                           --analytics-api-port 8181
                           --table NodeStatus.process_mem_cpu_usage
                           --where name=a6s40 cpu_info.module_id=Collector
@@ -61,7 +61,7 @@ class StatQuerier(object):
                           --sort "SUM(cpu_info.cpu_share)"
                           [--start-time now-10m --end-time now] | --last 10m
 
-            python stats.py --table NodeStatus.process_mem_cpu_usage
+            python3 stats.py --table NodeStatus.process_mem_cpu_usage
         """
         defaults = {
             'analytics_api_ip': '127.0.0.1',

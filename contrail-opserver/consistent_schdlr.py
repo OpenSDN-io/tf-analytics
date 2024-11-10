@@ -1,10 +1,6 @@
 #
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
-try:
-    from consistent_hash import ConsistentHash
-except ImportError:
-    from libpartition.consistent_hash import ConsistentHash
 import gevent
 import os
 import hashlib
@@ -15,6 +11,7 @@ from kazoo.handlers.gevent import SequentialGeventHandler
 from random import randint
 import struct
 import traceback
+from libpartition.consistent_hash import ConsistentHash
 from pysandesh.connection_info import ConnectionState
 from pysandesh.gen_py.process_info.ttypes import ConnectionStatus, \
     ConnectionType

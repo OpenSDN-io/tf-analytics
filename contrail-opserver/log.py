@@ -112,7 +112,7 @@ class LogQuerier(object):
     # Public functions
     def parse_args(self):
         """
-        Eg. python log.py --analytics-api-ip 127.0.0.1
+        Eg. python3 log.py --analytics-api-ip 127.0.0.1
                           --analytics-api-port 8181
                           --source 127.0.0.1
                           --node-type Control

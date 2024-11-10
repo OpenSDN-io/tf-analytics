@@ -4,7 +4,6 @@
 
 # -*- mode: python; -*-
 
-import os
 import sys
 Import('BuildEnv')
 
