@@ -8,7 +8,6 @@ import signal
 import unittest
 import logging
 import mock
-import six
 from collections import namedtuple
 
 import sys
@@ -621,49 +620,7 @@ class TestAlarmPlugins(unittest.TestCase):
                         }
                     }
                 ),
-                output=TestOutput(or_list=[
-                    {
-                        'and_list': [
-                            {
-                                'condition': {
-                                    'operand1': 'NodeStatus.disk_usage_info'
-                                        '.*.percentage_partition_space_used',
-                                    'operand2': {
-                                        'json_value': '[70, 90]'
-                                    },
-                                    'operation': 'range',
-                                    'variables': [
-                                        'NodeStatus.disk_usage_info.__key'
-                                    ]
-                                },
-                                'match': [
-                                    {
-                                        'json_operand1_val': '70',
-                                        'json_variables': {
-                                            'NodeStatus.disk_usage_info.__key':
-                                                '"dev/sda4"'
-                                        }
-                                    },
-                                    {
-                                        'json_operand1_val': '90',
-                                        'json_variables': {
-                                            'NodeStatus.disk_usage_info.__key':
-                                                '"dev/sda3"'
-                                        }
-                                    },
-                                    {
-                                        'json_operand1_val': '80',
-                                        'json_variables': {
-                                            'NodeStatus.disk_usage_info.__key':
-                                                '"dev/sda1"'
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]) if six.PY2 else \
-                TestOutput(or_list=[
+                output = TestOutput(or_list=[
                     {
                         'and_list': [
                             {

@@ -10,10 +10,10 @@ import socket
 from tempfile import mkdtemp
 import pickle as pickle
 from .snmpuve import SnmpUve
-from opserver.consistent_schdlr import ConsistentScheduler
+from libpartition.consistent_schdlr import ConsistentScheduler
 from .device_config import DeviceConfig, DeviceDict
 from .snmp_config_handler import SnmpConfigHandler
-from six.moves import configparser
+import configparser
 import signal
 import random
 import hashlib
@@ -309,7 +309,7 @@ class Controller(object):
 
     def sighup_handler(self):
         if self._config._args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.read(self._config._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

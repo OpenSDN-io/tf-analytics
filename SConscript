@@ -6,7 +6,6 @@
 # src directory
 
 import platform
-import six
 import subprocess
 import sys
 
@@ -55,7 +54,8 @@ common.Append(CCFLAGS = ['-Wall', '-Werror', '-Wsign-compare'])
 gpp_version = subprocess.check_output(
     "g++ --version | grep g++ | awk '{print $3}'",
     shell=True, env={}).rstrip()
-gpp_version = six.ensure_str(gpp_version)
+if isinstance(gpp_version, bytes):
+    gpp_version = gpp_version.decode()
 gpp_version_major = int(gpp_version.split(".")[0])
 if gpp_version == "4.8.5" or gpp_version_major >= 8:
     common.Append(CCFLAGS =['-Wno-narrowing', '-Wno-conversion-null'])

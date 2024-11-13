@@ -1,2 +1,4 @@
 gevent
 requests
+python3-netsnmp
+libpartition

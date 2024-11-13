@@ -10,7 +10,7 @@
 # Query StatsOracle info from analytics
 #
 
-from six.moves import configparser
+import configparser
 import argparse
 import json
 from .opserver_util import OpServerUtils
@@ -88,7 +88,7 @@ class StatQuerier(object):
         if args.conf_file:
             configfile = args.conf_file
 
-        config = configparser.SafeConfigParser(strict=False)
+        config = configparser.ConfigParser(strict=False)
         config.read(configfile)
         if 'KEYSTONE' in config.sections():
             if args.admin_user == None:

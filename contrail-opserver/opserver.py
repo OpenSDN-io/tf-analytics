@@ -30,9 +30,7 @@ import traceback
 import hashlib
 import errno
 import copy
-
-import six
-from six.moves import configparser
+import configparser
 
 from .analytics_db import AnalyticsDb
 from gevent.server import StreamServer
@@ -780,7 +778,7 @@ class OpServer(object):
         self._uvepartitions_state = ConnectionStatus.UP
 
         self.redis_uve_list = []
-        if isinstance(self._args.redis_uve_list, six.string_types):
+        if isinstance(self._args.redis_uve_list, str):
             self._args.redis_uve_list = self._args.redis_uve_list.split()
         ad_freq = 10
         us_freq = 5
@@ -1124,7 +1122,7 @@ class OpServer(object):
         # read contrail-analytics-api own conf file
         config = None
         if args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.read(args.conf_file)
             if 'DEFAULTS' in config.sections():
                 defaults.update(dict(config.items("DEFAULTS")))
@@ -1248,13 +1246,13 @@ class OpServer(object):
             help="Location of analytics api ssl CA certificate")
         SandeshConfig.add_parser_arguments(parser)
         self._args = parser.parse_args(remaining_argv)
-        if isinstance(self._args.collectors, six.string_types):
+        if isinstance(self._args.collectors, str):
             self._args.collectors = self._args.collectors.split()
-        if isinstance(self._args.redis_uve_list, six.string_types):
+        if isinstance(self._args.redis_uve_list, str):
             self._args.redis_uve_list = self._args.redis_uve_list.split()
-        if isinstance(self._args.zk_list, six.string_types):
+        if isinstance(self._args.zk_list, str):
             self._args.zk_list= self._args.zk_list.split()
-        if isinstance(self._args.api_server, six.string_types):
+        if isinstance(self._args.api_server, str):
             self._args.api_server = self._args.api_server.split()
 
         self._args.redis_use_ssl = (str(self._args.redis_use_ssl).lower() == 'true')
@@ -2655,7 +2653,7 @@ class OpServer(object):
 
     def sighup_handler(self):
         if self._args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.read(self._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:
@@ -2664,7 +2662,7 @@ class OpServer(object):
                     self.logger.warn(f"Option 'collectors' not found in DEFAULTS: {str(e)}")
                     self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
-                    if isinstance(collectors, six.string_types):
+                    if isinstance(collectors, str):
                         collectors = collectors.split()
                         new_chksum = hashlib.md5(("".join(collectors)).encode()).hexdigest()
                         if new_chksum != self._chksum:
@@ -2678,7 +2676,7 @@ class OpServer(object):
                     self.logger.warn(f"Option 'api_server' not found in DEFAULTS: {str(e)}")
                     self.logger.warn(f"Warn:\n{traceback.format_exc()}")
                 else:
-                    if isinstance(api_servers, six.string_types):
+                    if isinstance(api_servers, str):
                         api_servers = api_servers.split()
                     new_api_server_checksum = hashlib.md5((''.join(api_servers)).encode()).hexdigest()
                     if new_api_server_checksum != self._api_server_checksum:

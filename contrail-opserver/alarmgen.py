@@ -20,7 +20,7 @@ import signal
 import random
 import hashlib
 import logging
-from six.moves import configparser
+import configparser
 from collections import OrderedDict
 from pysandesh.sandesh_base import *
 from pysandesh.connection_info import ConnectionState
@@ -2607,7 +2607,7 @@ class Controller(object):
 
     def sighup_handler(self):
         if self._conf._args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.read(self._conf._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

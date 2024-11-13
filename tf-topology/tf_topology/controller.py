@@ -6,10 +6,10 @@ import socket
 from .topology_uve import LinkUve
 import gevent
 from gevent.lock import Semaphore
-from opserver.consistent_schdlr import ConsistentScheduler
+from libpartition.consistent_schdlr import ConsistentScheduler
 from .topology_config_handler import TopologyConfigHandler
 import traceback
-from six.moves import configparser
+import configparser
 import signal
 import random
 import hashlib
@@ -413,7 +413,7 @@ class Controller(object):
 
     def sighup_handler(self):
         if self._config._args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.read(self._config._args.conf_file)
             if 'DEFAULTS' in config.sections():
                 try:

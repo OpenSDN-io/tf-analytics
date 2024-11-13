@@ -2,7 +2,7 @@
 # Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
 #
 import argparse, sys
-from six.moves import configparser
+import configparser
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
 from sandesh_common.vns.ttypes import Module
@@ -113,7 +113,7 @@ Mibs = LldpTable, ArpTable
 
         config = None
         if args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.optionxform = str
             config.read(args.conf_file)
             if 'DEFAULTS' in config.sections():

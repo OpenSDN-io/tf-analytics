@@ -4,7 +4,7 @@
 import argparse
 import sys
 import re
-from six.moves import configparser
+import configparser
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.ttypes import SandeshLevel
 from sandesh_common.vns.constants import HttpPortTopology, \
@@ -110,7 +110,7 @@ optional arguments:
 
         config = None
         if args.conf_file:
-            config = configparser.SafeConfigParser(strict=False)
+            config = configparser.ConfigParser(strict=False)
             config.optionxform = str
             config.read(args.conf_file)
             if 'DEFAULTS' in config.sections():

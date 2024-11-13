@@ -7,7 +7,6 @@ import subprocess
 import os
 import time
 import socket
-import six
 import fcntl
 import tempfile
 import threading
@@ -64,7 +63,7 @@ def obj_to_dict(obj):
         for k, v in obj.items():
             data[k] = obj_to_dict(v)
         return data
-    elif hasattr(obj, '__iter__') and not isinstance(obj, six.string_types):
+    elif hasattr(obj, '__iter__') and not isinstance(obj, str):
         return [obj_to_dict(v) for v in obj]
     elif hasattr(obj, '__dict__'):
         data = dict([(key, obj_to_dict(value)) 
