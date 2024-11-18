@@ -339,22 +339,18 @@ class AlarmProcessor(object):
 
     def _compare_operand_vals(self, val1, val2, operation):
         try:
-            val1 = json.loads(val1)
+            if val1 is not None:
+                val1 = json.loads(val1)
         except (TypeError, ValueError) as e:
             self._logger.warn(
                 f"Failed to parse val1 as JSON: {str(e)}"
             )
-            self._logger.warn(
-                f"Warn:\n{traceback.format_exc()}"
-            )
         try:
-            val2 = json.loads(val2)
+            if val2 is not None:
+                val2 = json.loads(val2)
         except (TypeError, ValueError) as e:
             self._logger.warn(
                 f"Failed to parse val2 as JSON: {str(e)}"
-            )
-            self._logger.warn(
-                f"Warn:\n{traceback.format_exc()}"
             )
         if operation == '==':
             return val1 == val2
