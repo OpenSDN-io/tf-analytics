@@ -16,10 +16,10 @@ import os.path
 import subprocess
 import logging
 import socket
-import platform
 import time
 from kafka import KafkaClient
 from kazoo.client import KazooClient
+
 
 logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(message)s')
@@ -154,15 +154,7 @@ def replace_string_(filePath, findreplace):
     os.rename(tempName,filePath)
 
 def call_command_(command):
-
-    distribution = platform.dist()[0]
-    jpath = "/usr/local/java/jre1.6.0_43"
-    if distribution == "debian" and os.path.isdir(jpath):
-        jenv = { "JAVA_HOME" : jpath }
-    else:
-        jenv = None
-
-    process = subprocess.Popen(command.split(' '), env = jenv,
+    process = subprocess.Popen(command.split(' '),
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     return process.communicate()
