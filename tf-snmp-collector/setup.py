@@ -12,7 +12,7 @@ def requirements(filename):
 
 setuptools.setup(
     name='tf_snmp_collector',
-    version='0.2.0',
+    version='0.1.dev0',
     description='tf snmp collector package.',
     long_description=open('README.txt').read(),
     packages=setuptools.find_packages(),

@@ -46,7 +46,7 @@ common_sources_rules = [env.Install('tf_snmp_collector', f) for f in common_sour
 sdist_depends = [ prouter_pkg, snmp_collector_info_pkg, nodeinfo_pkg,
                   cpuinfo_pkg, process_info_pkg, common_sources_rules ]
 
-version = '0.2.0'               # Make this match what is in setup.py
+version = '0.1.dev0'               # Make this match what is in setup.py
 
 # XXX Was this disabled/removed as part of repo split? If so, it might
 # explain the version discrepancy. Probably this should be done via
@@ -85,20 +85,11 @@ doc_files += env.SandeshGenDoc('prouter.sandesh')
 doc_files += env.SandeshGenDoc('snmp_collector_info.sandesh')
 
 if 'install' in BUILD_TARGETS:
-    install_cmd = env.Command(None, sources + sdist_depends,
-                              cd_cmd + 'python3 setup.py install %s' %
-                              env['PYTHON_INSTALL_OPT'])
-    env.Depends(install_cmd, sdist_depends)
-    env.Alias('install', install_cmd)
-
-    install_root = GetOption('install_root')
-    if install_root is None:
-        install_root = ''
-    env.Alias(
-        'install',
-        env.Install(
-            install_root + '/opt/opensdn/pip/snmp-collector/',
-            Entry('#src/contrail-analytics/tf-snmp-collector/requirements.txt')))
+    install_whl_cmd = env.Command(
+        None, sources + sdist_depends,
+        cd_cmd + 'python3 setup.py bdist_wheel --dist-dir /pip')
+    env.Depends(install_whl_cmd, sdist_depends)
+    env.Alias('install', install_whl_cmd)
 
 env.Alias('install', env.Install(env['INSTALL_CONF'],
             'tf-snmp-collector.conf'))

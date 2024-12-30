@@ -1,4 +1,7 @@
 gevent
 requests
 python3-netsnmp
-libpartition
+libpartition==0.1.dev0
+sandesh==0.1.dev0
+sandesh_common==0.1.dev0
+contrail-config-common==0.1.dev0

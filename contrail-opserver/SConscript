@@ -101,21 +101,11 @@ alarmgen_doc_files += OpEnv.SandeshGenDoc('alarmgen_ctrl.sandesh')
 alarmgen_doc_files += OpEnv.SandeshGenDoc('#src/contrail-common/sandesh/library/common/sandesh_alarm_base.sandesh', OpEnv['TOP'] + '/opserver/')
 
 if 'install' in BUILD_TARGETS:
-    install_cmd = OpEnv.Command(None,
-                                'setup.py',
-                                cd_cmd + 'python3 setup.py install %s' %
-                                OpEnv['PYTHON_INSTALL_OPT'])
-    OpEnv.Depends(install_cmd, sdist_depends)
-    OpEnv.Alias('install', install_cmd)
-
-    install_root = GetOption('install_root')
-    if install_root is None:
-        install_root = ''
-    OpEnv.Alias(
-        'install',
-        OpEnv.Install(
-            install_root + '/opt/opensdn/pip/opserver/',
-            Entry('#src/contrail-analytics/contrail-opserver/requirements.txt')))
+    install_whl_cmd = OpEnv.Command(
+        None, 'setup.py',
+        cd_cmd + 'python3 setup.py bdist_wheel --dist-dir /pip')
+    OpEnv.Depends(install_whl_cmd, sdist_depends)
+    OpEnv.Alias('install', install_whl_cmd)
 
 OpEnv['OPSERVER_PKG'] = sdist_gen
 OpEnv.SConscript('plugins/test/alarm_process_status/SConscript', exports='OpEnv', duplicate = 0)

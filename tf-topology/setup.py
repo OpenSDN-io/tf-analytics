@@ -12,7 +12,7 @@ def requirements(filename):
 
 setuptools.setup(
     name='tf_topology',
-    version='0.1.0',
+    version='0.1.dev0',
     description='tungstenfabric topology package.',
     long_description=open('README.txt').read(),
     packages=setuptools.find_packages(),
