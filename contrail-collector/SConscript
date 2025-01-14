@@ -17,8 +17,6 @@ except ImportError:
 
 Import('BuildEnv')
 AnalyticsEnv = BuildEnv.Clone()
-#if sys.platform != 'darwin':
-#    AnalyticsEnv.CppDisableExceptions()
 
 # get appropriate python lib
 import subprocess

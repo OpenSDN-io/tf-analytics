@@ -133,7 +133,7 @@ test_sources = [
     '.stestr.conf',
     'tox.ini',
     'test',
-    '../../../controller/src/config/utils/contrail_alarm.py',
+    '../../../controller/src/config/utils/contrail_config_utils/contrail_alarm.py',
     ]
 
 test_sources_rules = []

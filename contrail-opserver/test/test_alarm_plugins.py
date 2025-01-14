@@ -69,7 +69,6 @@ class TestAlarmPlugins(unittest.TestCase):
     # end get_alarm_config
 
     def get_alarm_config_by_name(self, alarm_name):
-
         for alarm in alarm_list:
             if ((alarm['fq_name'])[1] == alarm_name):
                 alarm['uuid'] = None

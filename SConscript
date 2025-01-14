@@ -34,18 +34,10 @@ variant_dir_map['tf-topology'] = 'tf-topology'
 variant_dir_map['contrail-opserver'] = 'opserver'
 
 include = ['#/src/contrail-analytics', '#/build/include', '#src/contrail-common', '#controller/lib']
-
 libpath = ['#/build/lib']
-
-libs = ['boost_system', 'log4cplus', 'pthread']
+libs = ['boost_system', 'log4cplus', 'pthread', 'tbb']
 
 common = DefaultEnvironment().Clone()
-
-if common['OPT'] == 'production' or common.UseSystemTBB():
-    libs.append('tbb')
-else:
-    libs.append('tbb_debug')
-
 common.Append(LIBPATH = libpath)
 common.Prepend(LIBS = libs)
 
