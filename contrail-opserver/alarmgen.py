@@ -62,7 +62,7 @@ from pysandesh.util import UTCTimestampUsec
 from libpartition.libpartition import PartitionClient
 from collections import namedtuple
 from .strict_redis_wrapper import StrictRedisWrapper
-from kafka import common, KafkaProducer
+from kafka import KafkaProducer
 
 OutputRow = namedtuple("OutputRow",["key","typ","val"])
 

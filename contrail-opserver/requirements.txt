@@ -1,13 +1,13 @@
 requests
 lxml
 gevent
-redis>4.3
+redis
 xmltodict
 bottle<0.13
 sseclient
-kafka-python==1.4.0
-kazoo == 2.7.0
-stevedore<=3.3.0
+kafka-python
+kazoo
+stevedore
 sandesh==0.1.dev0
 sandesh_common==0.1.dev0
 contrail-config-common==0.1.dev0
