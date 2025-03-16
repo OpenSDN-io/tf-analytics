@@ -37,8 +37,7 @@ env.Prepend(LIBS=[  'cpuinfo',
                     'boost_program_options'])
 
 
-if sys.platform != 'darwin':
-    env.Append(LIBS=['rt'])
+env.Append(LIBS=['rt'])
 
 database_libs = ['cassandra_cql', 'cassandra']
 
@@ -140,14 +139,10 @@ build_obj = list(map(lambda x : env.Object(x), ['buildinfo.cc']))
 
 lib_cpuinfo = File('../base/libcpuinfo.a')
 lib_base = File('../base/libbase.a')
-if sys.platform != 'darwin':
-    env.Prepend(LINKFLAGS =
-                ['-Wl,--whole-archive',
-                 '-lbase', '-lcpuinfo',
-                 '-Wl,--no-whole-archive'])
-else:
-    env.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_base.path])
-    env.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_cpuinfo.path])
+env.Prepend(
+    LINKFLAGS = ['-Wl,--whole-archive',
+        '-lbase', '-lcpuinfo',
+        '-Wl,--no-whole-archive'])
 
 qed = env.Program(
         target = 'qed', 
@@ -156,13 +151,7 @@ qed = env.Program(
         ['../analytics/vizd_table_desc.o', 'rac_alloc.cc', '../analytics/viz_constants.o']
         )
 
-if env['OPT'] == 'coverage':
-    env.AppendUnique(CCFLAGS='-g')
-    env.AppendUnique(CCFLAGS='-O0')
-    env.AppendUnique(CCFLAGS='--coverage')
-    rac = 'rac_alloc.o'
-else:
-    rac = 'rac_alloc_test.cc'
+rac = 'rac_alloc_test.cc'
 
 qedt = env.UnitTest(
         target = 'qedt', 

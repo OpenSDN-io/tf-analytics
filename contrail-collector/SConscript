@@ -94,8 +94,7 @@ AnalyticsEnv.Prepend(LIBS=['cpuinfo',
         'rdkafka++',
         'rdkafka'])
 
-if PLATFORM.lower() != 'ubuntu' or (PLATFORM.lower() == 'ubuntu' and VERSION.find('16.') == 0):
-    AnalyticsEnv.Prepend(LIBS=['lz4'])
+AnalyticsEnv.Prepend(LIBS=['lz4'])
 
 database_libs = ['cassandra_cql', 'cassandra']
 
@@ -103,8 +102,7 @@ database_libs.append('gendb')
 database_libs.append('boost_regex')
 AnalyticsEnv.Prepend(LIBS=database_libs)
 
-if sys.platform != 'darwin':
-    AnalyticsEnv.Append(LIBS=['rt'])
+AnalyticsEnv.Append(LIBS=['rt'])
 
 libs = MapBuildDir(['sandesh',
         'analytics/ruleparser',
@@ -155,17 +153,11 @@ lib_cpuinfo = File('../base/libcpuinfo.a')
 lib_process_info = File('../base/libprocess_info.a')
 lib_nodeinfo = File('../base/libnodeinfo.a')
 lib_base = File('../base/libbase.a')
-if sys.platform != 'darwin':
-    AnalyticsEnv.Prepend(LINKFLAGS =
-                         ['-Wl,--whole-archive',
-                          '-lbase', '-lcpuinfo',
-                          '-lprocess_info', '-lnodeinfo',
-                          '-Wl,--no-whole-archive'])
-else:
-    AnalyticsEnv.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_base.path])
-    AnalyticsEnv.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_cpuinfo.path])
-    AnalyticsEnv.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_process_info.path])
-    AnalyticsEnv.Prepend(LINKFLAGS = ['-Wl,-force_load,' + lib_nodeinfo.path])
+AnalyticsEnv.Prepend(
+    LINKFLAGS = ['-Wl,--whole-archive',
+        '-lbase', '-lcpuinfo',
+        '-lprocess_info', '-lnodeinfo',
+        '-Wl,--no-whole-archive'])
 
 def RedisLuaBuild(env, scr_name):
   env.Command('%s_lua.cpp' % scr_name ,'%s.lua' % scr_name,\
@@ -228,38 +220,6 @@ AnalyticsEnv.SConscript('ruleparser/SConscript', exports='AnalyticsEnv', duplica
 #AnalyticsEnv.SConscript('database/SConscript', exports='AnalyticsEnv', duplicate = 0)
 
 test_suite = AnalyticsEnv.SConscript('test/SConscript', exports='AnalyticsEnv', duplicate = 0)
-
-def code_coverage(target, source, env):
-    shutil.rmtree(target[0].path, ignore_errors = True)
-
-    # lcov --base-directory $ROOT -- directory . --zerocounters -q
-    rundir = os.path.dirname(target[0].path)
-    os.system('lcov --base-directory . --directory ' + rundir +
-              ' --zerocounters -q')
-    # execute tests
-    ShEnv = {env['ENV_SHLIB_PATH']: 'build/lib'}
-
-    for test in test_suite:
-        cmd = test[0].path
-        logfile = open(cmd + '.log', 'w')
-        print("Executing for coverage... " + cmd)
-        subprocess.call([cmd], stdout=logfile, env=ShEnv)
-
-    # lcov --base-directory $ROOT -- directory . -c -o analytics_test.info
-    os.system('lcov --base-directory . --directory ' + rundir +
-              ' -c -o analytics_test.info')
-
-    # genhtml -o analytics/test_coverage analytics_test.info
-    os.system('genhtml -o ' + target[0].path +
-              ' -t "test coverage" --num-spaces 4 analytics_test.info')
-
-
-if AnalyticsEnv.get('OPT') == 'coverage':
-    test_coverage = AnalyticsEnv.Command(Dir('test_coverage'), '', code_coverage)
-    AnalyticsEnv.AlwaysBuild(test_coverage)
-    AnalyticsEnv.Alias('src/analytics:test_coverage', test_coverage)
-    for test in test_suite:
-        AnalyticsEnv.Depends(test_coverage, test)
 
 # Documentation
 CollectorDocFiles = []

@@ -55,9 +55,7 @@ if gpp_version == "4.8.5" or gpp_version_major >= 8:
         # auto_ptr is depricated - dont error on deprication warnings
         common.Append(CCFLAGS = ['-Wno-error=deprecated-declarations', '-Wno-deprecated-declarations'])
 
-if not sys.platform.startswith('darwin') and platform.system().startswith('Linux'):
-    common.Append(CCFLAGS = ['-Wno-unused-local-typedefs'])
-if sys.platform.startswith('freebsd'):
+if platform.system().startswith('Linux'):
     common.Append(CCFLAGS = ['-Wno-unused-local-typedefs'])
 common.Append(CPPPATH = include)
 common.Append(CCFLAGS = ['-DRAPIDJSON_NAMESPACE=contrail_rapidjson'])
@@ -66,11 +64,6 @@ BuildEnv = common.Clone()
 
 if sys.platform.startswith('linux'):
     BuildEnv.Append(CCFLAGS = ['-DLINUX'])
-elif sys.platform.startswith('darwin'):
-    BuildEnv.Append(CCFLAGS = ['-DDARWIN'])
-
-if sys.platform.startswith('freebsd'):
-    BuildEnv.Prepend(LINKFLAGS = ['-lprocstat'])
 
 #
 # Message documentation for common modules

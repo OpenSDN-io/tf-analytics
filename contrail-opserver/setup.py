@@ -10,14 +10,10 @@ import distutils
 
 class RunTestsCommand(Command):
     description = "Test command to run testr in virtualenv"
-    user_options = [
-        ('coverage', 'c', "Generate code coverage report"),
-        ('testrun=', None, "Run a specific test"),
-        ]
-    boolean_options = ['coverage']
+    user_options = []
+    boolean_options = []
     def initialize_options(self):
         self.cwd = None
-        self.coverage = False
         self.testrun = None
 
     def finalize_options(self):
@@ -29,9 +25,6 @@ class RunTestsCommand(Command):
     def run(self):
         logfname = 'test.log'
         args = '-V'
-        if self.coverage:
-            logfname = 'coveragetest.log'
-            args += ' -c'
         if self.testrun:
             logfname = self.testrun + '.log'
             args = self.testrun

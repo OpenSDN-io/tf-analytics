@@ -43,8 +43,6 @@ env.Library(target = 'ruleparser',
                       ruleparserl_obj,
                       t_ruleparser_obj,
                      ])
-import sys
-if sys.platform != 'darwin':
-    env['LIBS'] = []
+env['LIBS'] = []
 
 env.SConscript('test/SConscript', exports='AnalyticsEnv', duplicate = 0)
