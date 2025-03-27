@@ -21,7 +21,7 @@ import time
 logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(message)s')
 
-cassandra_bdir = '/tmp/cache-' + os.environ['USER'] + '-systemless_test'
+cassandra_bdir = '/tmp/cache-systemless_test'
 
 
 def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_password = None):
@@ -30,19 +30,14 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
     Arguments:
         cport : An unused TCP port for Cassandra to use as the client port
     '''
-    if not os.path.exists(cassandra_bdir):
-        call_command_("mkdir " + cassandra_bdir)
-
     cassandra_version = '3.10'
     cassandra_url = cassandra_bdir + '/apache-cassandra-'+cassandra_version+'-bin.tar.gz'
 
-    if not os.path.exists(cassandra_bdir):
-        call_command_("mkdir " + cassandra_bdir)
-
-    cassandra_download = 'wget -P ' + cassandra_bdir + ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/'+\
-        'apache-cassandra-'+cassandra_version+'-bin.tar.gz'
-
     if not os.path.exists(cassandra_url):
+        if not os.path.exists(cassandra_bdir):
+            call_command_("mkdir " + cassandra_bdir)
+        cassandra_download = 'wget -P ' + cassandra_bdir + ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/cassandra/'+\
+            'apache-cassandra-'+cassandra_version+'-bin.tar.gz'
         process = subprocess.Popen(cassandra_download.split(' '))
         process.wait()
         if process.returncode is not 0:

@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s %(levelname)s %(message)s')
 zookeeper_version = 'zookeeper-3.4.5'
 zookeeper_dl = '/zookeeper-3.4.5.tar.gz'
-zookeeper_bdir  = '/tmp/cache-' + os.environ['USER'] + '-systemless_test'
+zookeeper_bdir  = '/tmp/cache-systemless_test'
 
 def start_zoo(cport):
     '''
@@ -29,13 +29,13 @@ def start_zoo(cport):
     Arguments:
         cport : An unused TCP port for zookeeper to use as the client port
     '''
-    if not os.path.exists(zookeeper_bdir):
-        output,_ = call_command_("mkdir " + zookeeper_bdir)
-    zookeeper_download = 'wget -O ' + zookeeper_bdir + zookeeper_dl + \
-        ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/zookeeper' + \
-        zookeeper_dl + '?raw=true'
-
     if not os.path.exists(zookeeper_bdir + zookeeper_dl):
+        if not os.path.exists(zookeeper_bdir):
+            output,_ = call_command_("mkdir " + zookeeper_bdir)
+        zookeeper_download = 'wget -O ' + zookeeper_bdir + zookeeper_dl + \
+            ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/zookeeper' + \
+            zookeeper_dl + '?raw=true'
+
         process = subprocess.Popen(zookeeper_download.split(' '))
         process.wait()
         if process.returncode is not 0:

@@ -26,15 +26,15 @@ logging.basicConfig(level=logging.INFO,
 
 kafka_version = 'kafka_2.11-2.3.1'
 kafka_dl = '/kafka_2.11-2.3.1.tgz'
-kafka_bdir  = '/tmp/cache-' + os.environ['USER'] + '-systemless_test'
+kafka_bdir  = '/tmp/cache-systemless_test'
 
 def start_kafka(zk_client_port, broker_listen_port, broker_id=0):
-    if not os.path.exists(kafka_bdir):
-        output,_ = call_command_("mkdir " + kafka_bdir)
-    kafka_download = 'wget -nv --tries=3 -c -O ' + kafka_bdir + kafka_dl + \
-        ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/kafka' + \
-        kafka_dl + '?raw=true'
     if not os.path.exists(kafka_bdir + kafka_dl):
+        if not os.path.exists(kafka_bdir):
+            output,_ = call_command_("mkdir " + kafka_bdir)
+        kafka_download = 'wget -nv --tries=3 -c -O ' + kafka_bdir + kafka_dl + \
+            ' https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/kafka' + \
+            kafka_dl + '?raw=true'
         process = subprocess.Popen(kafka_download.split(' '))
         process.wait()
         if process.returncode is not 0:

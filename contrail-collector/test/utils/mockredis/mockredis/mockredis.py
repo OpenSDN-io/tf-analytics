@@ -22,14 +22,14 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
 
 redis_ver = '2.6.13'
-redis_bdir = '/tmp/cache-' + os.environ['USER'] + '-systemless_test'
+redis_bdir = '/tmp/cache-systemless_test'
 redis_url = redis_bdir + '/redis-'+redis_ver+'.tar.gz'
 redis_exe = redis_bdir + '/bin/redis-server'
 
 def install_redis():
-    if not os.path.exists(redis_bdir):
-        output,_ = call_command_("mkdir " + redis_bdir)
     if not os.path.exists(redis_url):
+        if not os.path.exists(redis_bdir):
+            output,_ = call_command_("mkdir " + redis_bdir)
         process = subprocess.Popen(['wget', '-P', redis_bdir,
                                     'https://github.com/OpenSDN-io/tf-third-party-cache/raw/master/redis/redis-'\
                                     + redis_ver + '.tar.gz'],
