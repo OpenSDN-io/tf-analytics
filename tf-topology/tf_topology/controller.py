@@ -93,9 +93,6 @@ class Controller(object):
                 self._logger.warn(
                     f"Failed to retrieve vRouter data for {vr}: {str(e)}"
                 )
-                self._logger.warn(
-                    f"Warn:\n{traceback.format_exc()}"
-                )
             for ip in d['VrouterAgent']['self_ip_list']:
                 self.vrouter_ips[ip] = vr # index
             for intf in d['VrouterAgent']['phy_if']:
