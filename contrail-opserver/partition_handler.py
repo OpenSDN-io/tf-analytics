@@ -4,7 +4,7 @@ from gevent import monkey
 monkey.patch_all()
 import logging
 import gevent
-from kafka import KafkaConsumer, common
+from kafka import KafkaConsumer, structs, errors
 import os
 import ast
 import json
@@ -739,7 +739,7 @@ class PartitionHandler(gevent.Greenlet):
                              security_protocol='SSL',
                              ssl_check_hostname=False,
                              **self._kafka_ssl_params)
-                    consumer.assign([common.TopicPartition(self._topic,0)])
+                    consumer.assign([structs.TopicPartition(self._topic,0)])
                 except Exception as ex:
                     self.part_cur_time = time.time()
                     if self.part_prev_time == 0 or self.part_cur_time - self.part_prev_time > 60:
@@ -756,7 +756,7 @@ class PartitionHandler(gevent.Greenlet):
                     raise RuntimeError(messag)
 
                 self._logger.info("Starting %s at position %d" % \
-                        (self._topic, consumer.position(common.TopicPartition(self._topic,0))))
+                        (self._topic, consumer.position(structs.TopicPartition(self._topic,0))))
 
                 if self._limit:
                     raise gevent.GreenletExit
@@ -786,7 +786,7 @@ class PartitionHandler(gevent.Greenlet):
                         self._logger.error("Type Error: %s trace %s" % \
                                 (str(ex.args), traceback.format_exc()))
                         gevent.sleep(0.1)
-                    except common.FailedPayloadsError as ex:
+                    except errors.FailedPayloadsError as ex:
                         self._logger.error("Payload Error: %s" %  str(ex.args))
                         gevent.sleep(0.1)
             except gevent.GreenletExit:
@@ -1089,7 +1089,7 @@ if __name__ == '__main__':
                     break
         except TypeError:
             gevent.sleep(0.1)
-        except common.FailedPayloadsError as ex:
+        except errors.FailedPayloadsError as ex:
             print("Payload Error: " + str(ex.args))
             gevent.sleep(0.1)
     lw=[]

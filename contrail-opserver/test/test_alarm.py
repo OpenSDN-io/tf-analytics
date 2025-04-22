@@ -455,7 +455,8 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
                     timestamp=None, timestamp_type=None,
                     key='ObjectYY:uve2|type2|gen1|'+socket.getfqdn("127.0.0.1")+':0',
                     value='{}', checksum=None,
-                    serialized_key_size=None, serialized_value_size=None)
+                    serialized_key_size=None, serialized_value_size=None,
+                    leader_epoch=None, headers=[], serialized_header_size=-1)
         mock_KafkaConsumer.return_value.poll.side_effect = \
             m_poll
 
@@ -506,7 +507,8 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
                     timestamp=None, timestamp_type=None,
                     key='ObjectYY:uve2|type2|gen1|127.0.0.5:0',
                     value='{}', checksum=None,
-                    serialized_key_size=None, serialized_value_size=None)
+                    serialized_key_size=None, serialized_value_size=None,
+                    leader_epoch=None, headers=[], serialized_header_size=-1)
         mock_KafkaConsumer.return_value.poll.side_effect = \
             m_poll
 
@@ -524,7 +526,8 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
                     timestamp=None, timestamp_type=None,
                     key='ObjectYY:uve2|type2|gen1|127.0.0.5:0',
                     value='{}', checksum=None,
-                    serialized_key_size=None, serialized_value_size=None)
+                    serialized_key_size=None, serialized_value_size=None,
+                    leader_epoch=None, headers=[], serialized_header_size=-1)
         self.assertTrue(self.checker_dict([1, "ObjectYY", "uve2"], self._ag.ptab_info))
 
 
