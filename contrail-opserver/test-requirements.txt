@@ -11,3 +11,4 @@ utils/mockkafka
 utils/mockzoo
 ../opserver/plugins/test/alarm_partial_sysinfo/dist/alarm_partial_sysinfo-0.1.dev0.tar.gz
 ../opserver/plugins/test/alarm_process_status/dist/alarm_process_status-0.1.dev0.tar.gz
+requests>=2.32.0 # not directly required, pinned by Snyk to avoid a vulnerability
