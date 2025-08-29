@@ -30,7 +30,7 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
     Arguments:
         cport : An unused TCP port for Cassandra to use as the client port
     '''
-    cassandra_version = '3.10'
+    cassandra_version = '4.1.10'
     cassandra_url = cassandra_bdir + '/apache-cassandra-'+cassandra_version+'-bin.tar.gz'
 
     if not os.path.exists(cassandra_url):
@@ -134,7 +134,7 @@ def verify_cassandra(cqlport):
     retry_threshold = 10
     retry = 1
     cassbase = "/tmp/cassandra.%s.%d/" % (os.getenv('USER', 'None'), cqlport)
-    cql_command = cassbase + "apache-cassandra-3.10/bin/cqlsh " + "127.0.0.1 " + str(cqlport) + " -e \"show version\""
+    cql_command = cassbase + "apache-cassandra-4.1.10/bin/cqlsh " + "127.0.0.1 " + str(cqlport) + " -e \"show version\""
     while retry < retry_threshold:
         process = subprocess.Popen(cql_command.split(' '))
         process.wait()

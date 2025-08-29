@@ -358,7 +358,7 @@ int main(int argc, char **argv) {
     char *rpath = getenv("RULEENGPATH");
     if (rpath != NULL) {
         PyObject* sysPath = PySys_GetObject((char*)"path");
-        PyList_Insert(sysPath, 0, PyString_FromString(rpath));
+        PyList_Insert(sysPath, 0, PyUnicode_FromString(rpath));
     }
 
     LoggingInit();

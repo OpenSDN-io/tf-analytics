@@ -54,7 +54,8 @@ if gpp_version == "4.8.5" or gpp_version_major >= 8:
     if gpp_version_major >= 8:
         # auto_ptr is depricated - dont error on deprication warnings
         common.Append(CCFLAGS = ['-Wno-error=deprecated-declarations', '-Wno-deprecated-declarations'])
-
+        # int in bool context - dont error on this
+        common.Append(CCFLAGS = ['-Wno-error=int-in-bool-context'])
 if platform.system().startswith('Linux'):
     common.Append(CCFLAGS = ['-Wno-unused-local-typedefs'])
 common.Append(CPPPATH = include)

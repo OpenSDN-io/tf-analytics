@@ -67,7 +67,7 @@ class AnalyticsTest(testtools.TestCase, fixtures.TestWithFixtures):
             SYSTEM_OBJECT_TABLE, SYSTEM_OBJECT_START_TIME,
             SYSTEM_OBJECT_ANALYTICS, start_time)
         cassbase = "/tmp/cassandra.%s.%d/" % (os.getenv('USER', 'None'), int(self.__class__.cassandra_port))
-        cql_command = cassbase + "apache-cassandra-3.10/bin/cqlsh " + "127.0.0.1 " + str(self.__class__.cassandra_port) + " -k " + COLLECTOR_KEYSPACE_CQL + " -e \"" + query + "\""
+        cql_command = cassbase + "apache-cassandra-4.1.10/bin/cqlsh " + "127.0.0.1 " + str(self.__class__.cassandra_port) + " -k " + COLLECTOR_KEYSPACE_CQL + " -e \"" + query + "\""
         process = subprocess.Popen(cql_command.split(' '))
         process.wait()
         if process.returncode != 0:

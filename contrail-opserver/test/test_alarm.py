@@ -382,7 +382,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('opserver.partition_handler.KafkaConsumer', autospec=True)
+    @mock.patch('kafka.KafkaConsumer')
     # Test partition Initialization, including boot-straping using UVEServer
     # Test partition shutdown as well
     def test_00_init(self,
@@ -405,8 +405,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
         mock_redis_instances.side_effect = m_redis_instances
 
         m_poll = Mock_poll()
-        mock_KafkaConsumer.return_value.poll.side_effect = \
-            m_poll
+        mock_KafkaConsumer.return_value.poll.side_effect = m_poll
 
         self._ag.libpart_cb([1])
         self.assertTrue(self.checker_dict([1, "ObjectXX", "uve1"], self._ag.ptab_info))
@@ -426,7 +425,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('opserver.partition_handler.KafkaConsumer', autospec=True)
+    @mock.patch('kafka.KafkaConsumer')
     # Test initialization followed by read from Kafka
     # Also test for deletetion of a boot-straped UVE
     def test_01_rxmsg(self,
@@ -473,7 +472,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('opserver.partition_handler.KafkaConsumer', autospec=True)
+    @mock.patch('kafka.KafkaConsumer')
     # Test late bringup of collector
     # Also test collector shutdown
     def test_02_collectorha(self,

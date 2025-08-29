@@ -46,6 +46,7 @@ AnalyticsEnv.Append(CPPPATH = ['/usr/include/'+ python,
                               ])
 if PLATFORM.lower() == 'rocky linux':
     AnalyticsEnv.Append(LIBS=['boost_python39', python])
+    AnalyticsEnv.Append(CPPDEFINES=['BOOST_DISABLE_ASSERTS'])
 else:
     AnalyticsEnv.Append(LIBS=['boost_python', python])
 

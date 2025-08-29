@@ -10,5 +10,5 @@ setup(name='mockredis',
       url='http://opencontrail.org/',
       packages=['mockredis', ],
       data_files=[('lib/python2.7/site-packages/mockredis', ['redis.24.conf', 'redis.26.conf']),
-                  ('lib/python3.6/site-packages/mockredis', ['redis.24.conf', 'redis.26.conf']),],
+                  ('lib/python3.9/site-packages/mockredis', ['redis.24.conf', 'redis.26.conf']),],
      )
