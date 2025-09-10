@@ -100,6 +100,13 @@ DbHandler::DbHandler(EventManager *evm,
         tablespace_ = g_viz_constants.COLLECTOR_KEYSPACE_CQL + '_' + cassandra_options.cluster_id_;
     }
 
+    if (cassandra_options.replication_factor_.empty()) {
+        replication_factor_ = "1";
+        DB_LOG(WARN, "CASSANDRA.replication_factor not set; defaulting to 1");
+    } else {
+        replication_factor_ = cassandra_options.replication_factor_;
+    }
+
     if (use_db_write_options_) {
         // Set disk-usage watermark defaults
         SetDiskUsagePercentageHighWaterMark(
@@ -521,7 +528,7 @@ bool DbHandler::Initialize() {
         return false;
     }
 
-    if (!dbif_->Db_AddSetTablespace(tablespace_, "2")) {
+    if (!dbif_->Db_AddSetTablespace(tablespace_, replication_factor_)) {
         DB_LOG(ERROR, "Create/Set KEYSPACE: " << tablespace_ << " FAILED");
         return false;
     }

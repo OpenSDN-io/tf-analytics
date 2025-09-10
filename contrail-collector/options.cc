@@ -497,11 +497,14 @@ static bool ValidateCompactionStrategyOption(
         (compaction_strategy ==
         GenDb::g_gendb_constants.LEVELED_COMPACTION_STRATEGY) ||
         (compaction_strategy ==
-        GenDb::g_gendb_constants.SIZE_TIERED_COMPACTION_STRATEGY))) {
+        GenDb::g_gendb_constants.SIZE_TIERED_COMPACTION_STRATEGY) ||
+        (compaction_strategy ==
+        GenDb::g_gendb_constants.TIME_WINDOW_COMPACTION_STRATEGY))) {
         cout << "Invalid " << option <<  ", please select one of [" <<
             GenDb::g_gendb_constants.DATE_TIERED_COMPACTION_STRATEGY << ", " <<
             GenDb::g_gendb_constants.LEVELED_COMPACTION_STRATEGY << ", " <<
-            GenDb::g_gendb_constants.SIZE_TIERED_COMPACTION_STRATEGY << "]" <<
+            GenDb::g_gendb_constants.SIZE_TIERED_COMPACTION_STRATEGY << ", " <<
+            GenDb::g_gendb_constants.TIME_WINDOW_COMPACTION_STRATEGY << "]" <<
             endl;
         return false;
     }
@@ -705,6 +708,8 @@ void Options::Process(int argc, char *argv[],
         "CASSANDRA.cassandra_ca_certs");
     GetOptValue<string>(var_map, cassandra_options_.compaction_strategy_,
         "CASSANDRA.compaction_strategy");
+    GetOptValue<string>(var_map, cassandra_options_.replication_factor_,
+        "CASSANDRA.replication_factor");
     if (!ValidateCompactionStrategyOption(
         cassandra_options_.compaction_strategy_,
         "CASSANDRA.compaction_strategy")) {

@@ -1,5 +1,7 @@
+junitxml
 os-testr
 stestr
+urllib3<2.0
 testrepository==0.0.20
 python-subunit==1.4.0
 fixtures==3.0.0

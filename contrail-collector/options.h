@@ -108,6 +108,7 @@ public:
         bool use_ssl_;
         std::string ca_certs_;
         std::string compaction_strategy_;
+        std::string replication_factor_;
         std::string flow_tables_compaction_strategy_;
         bool disable_all_db_writes_;
         bool disable_db_stats_writes_;

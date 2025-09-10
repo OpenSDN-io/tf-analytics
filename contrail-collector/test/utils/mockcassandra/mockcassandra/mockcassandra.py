@@ -70,8 +70,10 @@ def start_cassandra(cport, sport_arg=None, cassandra_user=None, cassandra_passwo
         (cport, cqlport))
 
     replace_string_(confdir + "cassandra.yaml", \
-        [("storage_port: 7000","storage_port: " + str(sport)),
-        ("native_transport_port: 9042","native_transport_port: " + str(cqlport))])
+        [("storage_port: 7000", "storage_port: " + str(sport)),
+        ("native_transport_port: 9042", "native_transport_port: " + str(cqlport)),
+        ('- seeds: "127.0.0.1:7000"', '- seeds: "127.0.0.1:' + str(sport) + '"'),
+        ('sasi_indexes_enabled: false', 'sasi_indexes_enabled: true')])
 
     if cassandra_user is not None and cassandra_password is not None:
         logging.info('Cassandra setting password')

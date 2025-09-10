@@ -287,6 +287,7 @@ private:
     static tbb::mutex fmutex_;
     std::string tablespace_;
     std::string compaction_strategy_;
+    std::string replication_factor_;
     std::string flow_tables_compaction_strategy_;
     UniformInt8RandomGenerator gen_partition_no_;
     bool disable_all_writes_;

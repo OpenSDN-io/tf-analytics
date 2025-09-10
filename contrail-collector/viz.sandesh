@@ -1152,10 +1152,10 @@ const u16 MSG_TABLE_MAX_OBJECTS_PER_MSG = 6
 const map<string, table_schema> _VIZD_SESSION_TABLE_SCHEMA = {
     SESSION_TABLE : {
         'columns' : [
-            {'name' : 'key', 'datatype': Gendb.DbDataType.Unsigned32Type },
-            {'name' : 'key2', 'datatype': Gendb.DbDataType.Unsigned8Type },
-            {'name' : 'key3', 'datatype': Gendb.DbDataType.Unsigned8Type },
-            {'name' : 'key4', 'datatype': Gendb.DbDataType.Unsigned8Type },
+            {'name' : 'key', 'datatype': Gendb.DbDataType.Unsigned32Type, 'key': true },
+            {'name' : 'key2', 'datatype': Gendb.DbDataType.Unsigned8Type, 'key': true },
+            {'name' : 'key3', 'datatype': Gendb.DbDataType.Unsigned8Type, 'key': true },
+            {'name' : 'key4', 'datatype': Gendb.DbDataType.Unsigned8Type, 'key': true },
             {'name' : 'column1',
              'datatype': Gendb.DbDataType.Unsigned16Type, 'clustering': true },
             {'name' : 'column2',
@@ -1198,7 +1198,7 @@ const map<string, table_schema> _VIZD_SESSION_TABLE_SCHEMA = {
              'index_type' : GenDb.ColIndexType.CUSTOM_INDEX,
              'index_mode' : GenDb.ColIndexMode.CONTAINS },
             {'name' : 'column16', 'datatype': Gendb.DbDataType.UTF8Type,
-             'index_type' : GenDb.CoIndexType.CUSTOM_INDEX,
+             'index_type' : GenDb.ColIndexType.CUSTOM_INDEX,
              'index_mode' : GenDb.ColIndexMode.CONTAINS },
             {'name' : 'column17', 'datatype': Gendb.DbDataType.UTF8Type,
              'index_type' : GenDb.ColIndexType.CUSTOM_INDEX,

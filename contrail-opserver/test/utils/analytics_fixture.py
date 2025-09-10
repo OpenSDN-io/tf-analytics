@@ -119,9 +119,12 @@ class Collector(object):
         server_list = socket.getfqdn("127.0.0.1")+':'
         if self.analytics_fixture.cassandra_port == '0':
             server_list = ''
+        # Cassandra 4 do not support DateTieredCompactionStrategy
         args = [self.analytics_fixture.builddir + '/analytics/vizd',
             '--DEFAULT.cassandra_server_list', server_list +
             str(self.analytics_fixture.cassandra_port),
+            '--CASSANDRA.flow_tables.compaction_strategy',
+            'TimeWindowCompactionStrategy',
             '--REDIS.port',
             str(self._redis_uve.port),
             '--COLLECTOR.port', str(self.listen_port),

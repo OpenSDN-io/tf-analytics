@@ -70,7 +70,7 @@ class TestChecker(object):
         logging.info("dict exp %s actual %s match %s" % \
             (str(expected), str(actual), str(match)))
         return result
-    
+
     @retry(delay=1, tries=3)
     def checker_exact(self,expected,actual,match=True):
         result = False
@@ -126,7 +126,7 @@ class Mock_get_part(Mock_base):
         if key not in self.store:
             return {}
         return self.store[key]
-        
+
 class Mock_get_uve(Mock_base):
     def __init__(self, *args, **kwargs):
         Mock_base.__init__(self, *args, **kwargs)
@@ -179,7 +179,7 @@ class Mock_usp(object):
             if not self._content:
                 if not value is None:
                     value = {}
-            self._cb(self._partno, self._pi, key, type, value) 
+            self._cb(self._partno, self._pi, key, type, value)
 
 # Tests for UveStreamer and UveCache
 class TestUveStreamer(unittest.TestCase, TestChecker):
@@ -190,7 +190,7 @@ class TestUveStreamer(unittest.TestCase, TestChecker):
     @classmethod
     def tearDownClass(cls):
         pass
-    
+
     def setUp(self):
         self.mock_agp = Mock_agp()
         self.ustr = UveStreamer(logging, None, None, self.mock_agp, None,\
@@ -226,7 +226,7 @@ class TestUveStreamer(unittest.TestCase, TestChecker):
                 [0,"ObjectXX:uve1"],\
                 self.ustr._uvedbcache._partkeys))
 
-        # remove partition. UVE should go too        
+        # remove partition. UVE should go too
         del self.mock_agp[0]
         self.assertTrue(self.checker_dict(\
                 ["ObjectXX","uve1"],\
@@ -265,7 +265,7 @@ class TestUveStreamer(unittest.TestCase, TestChecker):
                 self.ustr._uvedbcache._partkeys[0]))
 
 
-# Tests for all AlarmGenerator code, using mocks for 
+# Tests for all AlarmGenerator code, using mocks for
 # external interfaces for UVEServer, Kafka, libpartition
 # and Discovery
 class TestAlarmGen(unittest.TestCase, TestChecker):
@@ -280,7 +280,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     def tearDownClass(cls):
         cls._pc.stop()
         cls._kc.stop()
-    
+
     def setUp(self):
         config = CfgParser('--http_server_port 0 '
                            '--zk_list '+socket.getfqdn("127.0.0.1")+':0 '
@@ -382,7 +382,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('kafka.KafkaConsumer')
+    @mock.patch('opserver.partition_handler.KafkaConsumer')
     # Test partition Initialization, including boot-straping using UVEServer
     # Test partition shutdown as well
     def test_00_init(self,
@@ -390,7 +390,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
             mock_get_uve, mock_get_part, mock_redis_instances,
             mock_send_agg_uve, mock_clear_agg_uve, mock_reconnect_agg_uve):
 
-        m_get_part = Mock_get_part() 
+        m_get_part = Mock_get_part()
         m_get_part[(1,(socket.getfqdn("127.0.0.1"),0,0))] = socket.getfqdn("127.0.0.1") + ":0", \
             { "gen1" :
                 { "ObjectXX:uve1" : {"type1":{}}  }}
@@ -417,7 +417,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
         self._ag.libpart_cb([])
         self.assertTrue(self.checker_dict([1, "ObjectXX", "uve1"],\
             self._ag.ptab_info, False))
-        
+
 
     @mock.patch('opserver.alarmgen.Controller.reconnect_agg_uve')
     @mock.patch('opserver.alarmgen.Controller.clear_agg_uve')
@@ -425,7 +425,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('kafka.KafkaConsumer')
+    @mock.patch('opserver.partition_handler.KafkaConsumer')
     # Test initialization followed by read from Kafka
     # Also test for deletetion of a boot-straped UVE
     def test_01_rxmsg(self,
@@ -433,7 +433,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
             mock_get_uve, mock_get_part, mock_redis_instances,
             mock_send_agg_uve, mock_clear_agg_uve, mock_reconnect_agg_uve):
 
-        m_get_part = Mock_get_part() 
+        m_get_part = Mock_get_part()
         m_get_part[(1,(socket.getfqdn("127.0.0.1"),0,0))] = socket.getfqdn("127.0.0.1")+":0", \
             { "gen1" :
                 { "ObjectXX:uve1" : {"type1":{}}  }}
@@ -472,7 +472,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
     @mock.patch.object(UVEServer, 'redis_instances')
     @mock.patch.object(UVEServer, 'get_part')
     @mock.patch.object(UVEServer, 'get_uve')
-    @mock.patch('kafka.KafkaConsumer')
+    @mock.patch('opserver.partition_handler.KafkaConsumer')
     # Test late bringup of collector
     # Also test collector shutdown
     def test_02_collectorha(self,
@@ -480,7 +480,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
             mock_get_uve, mock_get_part, mock_redis_instances,
             mock_send_agg_uve, mock_clear_agg_uve, mock_reconnect_agg_uve):
 
-        m_get_part = Mock_get_part() 
+        m_get_part = Mock_get_part()
         m_get_part[(1,(socket.getfqdn("127.0.0.1"),0,0))] = socket.getfqdn("127.0.0.1")+":0", \
             { "gen1" :
                 { "ObjectXX:uve1" : { "type1":{} } }}
@@ -1324,7 +1324,7 @@ class TestAlarmGen(unittest.TestCase, TestChecker):
                     uve_key='Table2:host1',
                     uve={
                         'A': {
-                            'D': 'test' 
+                            'D': 'test'
                         },
                         'X': {
                             'Y': ['xyz', 'abc']

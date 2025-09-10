@@ -2406,9 +2406,10 @@ class AnalyticsUveTest(testtools.TestCase, fixtures.TestWithFixtures):
         assert analytics_obj.verify_analytics_tls_version_negotiation('--tlsv1.2',
                 server_ssl_params)
         # unsupported version(<tlsv1.2)
-        assert not analytics_obj.verify_analytics_tls_version_negotiation('--tlsv1.1',
+        # --tlsv*.* means not less, we should use --tls-max now
+        assert not analytics_obj.verify_analytics_tls_version_negotiation('--tls-max 1.1',
                 server_ssl_params)
-        assert not analytics_obj.verify_analytics_tls_version_negotiation('--tlsv1.0',
+        assert not analytics_obj.verify_analytics_tls_version_negotiation('--tls-max 1.0',
                 server_ssl_params)
         assert not analytics_obj.verify_analytics_tls_version_negotiation('--sslv3',
                 server_ssl_params)
