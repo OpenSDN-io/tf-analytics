@@ -86,8 +86,6 @@ if 'install' in BUILD_TARGETS:
     env.Depends(install_whl_cmd, sdist_depends)
     env.Alias('install', install_whl_cmd)
 
-env.Alias('install', env.Install(env['INSTALL_CONF'],
-            'tf-topology.conf'))
 env.Alias('install', env.Install(
     env['INSTALL_MESSAGE_DOC'] + '/tf-topology/', doc_files))
 

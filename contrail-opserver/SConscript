@@ -116,10 +116,6 @@ OpEnv.Default(sdist_gen)
 OpEnv.Alias("contrail-analytics-api", sdist_gen)
 
 OpEnv.Alias('install', OpEnv.Install(
-            OpEnv['INSTALL_CONF'], 'contrail-analytics-api.conf'))
-OpEnv.Alias('install', OpEnv.Install(
-            OpEnv['INSTALL_CONF'], 'contrail-alarm-gen.conf'))
-OpEnv.Alias('install', OpEnv.Install(
             OpEnv['INSTALL_MESSAGE_DOC'] + '/contrail-analytics-api/',
             opserver_doc_files))
 OpEnv.Alias('install', OpEnv.Install(

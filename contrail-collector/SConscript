@@ -241,8 +241,6 @@ CollectorDocFiles += AnalyticsEnv.SandeshGenDoc('#src/contrail-common/sandesh/li
 AnalyticsEnv.Alias('install', AnalyticsEnv.InstallAs(
             AnalyticsEnv['INSTALL_BIN'] + '/contrail-collector', vizd))
 AnalyticsEnv.Alias('install', AnalyticsEnv.Install(
-            AnalyticsEnv['INSTALL_CONF'], 'contrail-collector.conf'))
-AnalyticsEnv.Alias('install', AnalyticsEnv.Install(
             AnalyticsEnv['INSTALL_MESSAGE_DOC'] + '/contrail-collector/', CollectorDocFiles))
 
 # Local Variables:
