@@ -21,14 +21,15 @@ from .util import retry
 from pysandesh.sandesh_base import *
 from pysandesh.gen_py.sandesh.constants import DEFAULT_SANDESH_SEND_RATELIMIT
 from opserver.sandesh.alarmgen_ctrl.sandesh_alarm_base.ttypes import *
-from sandesh.virtual_machine.ttypes import *
-from sandesh.virtual_network.ttypes import *
-from sandesh.flow.ttypes import *
-from sandesh.alarm_test.ttypes import *
-from sandesh.object_table_test.ttypes import *
+from ..sandesh.virtual_machine.ttypes import *
+from ..sandesh.virtual_network.ttypes import *
+from ..sandesh.flow.ttypes import *
+from ..sandesh.alarm_test.ttypes import *
+from ..sandesh.object_table_test.ttypes import *
 from .analytics_fixture import AnalyticsFixture
 from .generator_introspect_utils import VerificationGenerator
 from .opserver_introspect_utils import VerificationOpsSrv
+
 
 class GeneratorFixture(fixtures.Fixture):
     _BYTES_PER_PACKET = 1024
@@ -81,7 +82,7 @@ class GeneratorFixture(fixtures.Fixture):
         self._sandesh_instance = Sandesh()
         self._http_port = AnalyticsFixture.get_free_port()
         sandesh_pkg = ['opserver.sandesh.alarmgen_ctrl.sandesh_alarm_base',
-                       'sandesh']
+                       'test.sandesh']
         self._sandesh_instance.init_generator(
             self._name, self._hostname, self._node_type, self._inst,
             self._collectors, '', self._http_port,

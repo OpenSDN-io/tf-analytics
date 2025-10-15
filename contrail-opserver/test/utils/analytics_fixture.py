@@ -2565,7 +2565,7 @@ class AnalyticsFixture(fixtures.Fixture):
             assert(r['protocol'] == stats['protocol'])
             assert(r['SUM(bytes)'] == stats['SUM(bytes)'])
             assert(r['SUM(packets)'] == stats['SUM(packets)'])
-        
+
         # 6. direction_ing + stats
         self.logger.info('Flowseries: [direction_ing, SUM(bytes), SUM(packets)')
         res = vns.post_query(
@@ -2588,7 +2588,7 @@ class AnalyticsFixture(fixtures.Fixture):
         assert(res[0]['SUM(packets)'] == 3*exp_sum_pkts)
         assert(res[0]['SUM(bytes)'] == 3*exp_sum_bytes)
         assert(res[0]['direction_ing'] == 1)
-        
+
         self.logger.info('Flowseries: [direction_ing, SUM(bytes), SUM(packets)]')
         result = vns.post_query(
             'FlowSeriesTable',
@@ -2601,7 +2601,7 @@ class AnalyticsFixture(fixtures.Fixture):
         assert(result[0]['SUM(packets)'] == 3*exp_sum_pkts)
         assert(result[0]['SUM(bytes)'] == 3*exp_sum_bytes)
         assert(result[0]['direction_ing'] == 0)
-        
+
         # 7. T=<granularity> + tuples
         self.logger.info(
             'Flowseries: [T=<x>, sourcevn, destvn, sport, dport, protocol]')
@@ -3457,7 +3457,8 @@ class AnalyticsFixture(fixtures.Fixture):
                     self.logger.info('%s' % ((35+len(name))*'*'))
                     self.logger.info('Log for %s' % (name))
                     self.logger.info('%s' % ((35+len(name))*'*'))
-                    self.logger.info(fin.read())
+                    # comment it to not spam logs
+                    #self.logger.info(fin.read())
                     self.logger.info('%s' % ((35+len(name))*'*'))
         subprocess.call(['rm', '-rf', log_file])
         return rcode
@@ -3483,7 +3484,7 @@ class AnalyticsFixture(fixtures.Fixture):
             flags = fcntl(pipein, F_GETFL)
             fcntl(pipein, F_SETFL, flags | os.O_NONBLOCK)
             pipes[pname] = pipein , pipe_name
-            
+
         stdout_name = None
         if is_py:
             instance = self.run_py_daemon(args)
@@ -3493,7 +3494,7 @@ class AnalyticsFixture(fixtures.Fixture):
                 instance = subprocess.Popen(args, stdout=o,
                                  stderr=subprocess.STDOUT, bufsize=0,
                                  preexec_fn = preexec)
-      
+
         pmap = {} 
         for k,v in pipes.items(): 
             tries = 50

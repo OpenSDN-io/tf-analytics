@@ -8,8 +8,5 @@ sseclient
 kafka-python<2.2
 kazoo
 stevedore
-sandesh==0.1.dev0
-sandesh_common==0.1.dev0
 contrail-config-common==0.1.dev0
-contrail-api-client==0.1.dev0
 libpartition==0.1.dev0

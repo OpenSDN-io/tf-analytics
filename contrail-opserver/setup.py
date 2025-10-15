@@ -42,7 +42,7 @@ def requirements(filename):
 setup(
     name='opserver',
     version='0.1.dev0',
-    packages=find_packages(exclude=["test.*", "build.*", "plugins.*"]),
+    packages=find_packages(exclude=["test", "build", "plugins"]),
     package_data={'': ['*.html', '*.css', '*.xml']},
     zip_safe=False,
     include_package_data=True,

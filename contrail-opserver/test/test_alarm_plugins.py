@@ -25,7 +25,7 @@ from opserver.alarmgen import AlarmProcessor
 from opserver.opserver_util import camel_case_to_hyphen
 
 from cfgm_common.exceptions import *
-from contrail_alarm import alarm_list
+from contrail_config_utils.contrail_alarm import alarm_list
 from gevent import signal_handler as gevent_signal
 
 logging.basicConfig(level=logging.DEBUG,

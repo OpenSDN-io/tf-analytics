@@ -79,7 +79,7 @@ def find_buildroot(path):
     try:
         return os.environ['BUILDTOP']
     except:
-        return path + '/build/debug'
+        return '/root/contrail/build/debug/'
 #end find_buildroot
 
 def _get_free_port_naively():

@@ -16,7 +16,7 @@ import fixtures
 import socket
 from .util import retry
 from pysandesh.sandesh_base import *
-from sandesh.stats_test.ttypes import *
+from ..sandesh.stats_test.ttypes import *
 from .analytics_fixture import AnalyticsFixture
 from .generator_introspect_utils import VerificationGenerator
 from .opserver_introspect_utils import VerificationOpsSrv
@@ -42,7 +42,7 @@ class StatsFixture(fixtures.Fixture):
         self._http_port = AnalyticsFixture.get_free_port()
         self._sandesh_instance.init_generator(
             self._name, self._hostname, self._node_type, "0", self._collectors,
-            '', self._http_port, sandesh_req_uve_pkg_list=['sandesh'])
+            '', self._http_port, sandesh_req_uve_pkg_list=['test.sandesh'])
         self._sandesh_instance.set_logging_params(enable_local_log=True,
                                                   level=SandeshLevel.UT_DEBUG)
     # end setUp

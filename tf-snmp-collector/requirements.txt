@@ -1,6 +1,4 @@
 gevent
 python3-netsnmp
 libpartition==0.1.dev0
-sandesh==0.1.dev0
-sandesh_common==0.1.dev0
 contrail-config-common==0.1.dev0
