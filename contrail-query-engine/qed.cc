@@ -54,9 +54,6 @@ using process::Signal;
 // It will make it easier to debug qed during systest
 volatile int gdbhelper = 1;
 int timer_count = 0;
-bool QedVersion(std::string &version) {
-    return MiscUtils::GetBuildInfo(MiscUtils::Analytics, BuildInfo, version);
-}
 
 static EventManager * pevm = NULL;
 static Options options;

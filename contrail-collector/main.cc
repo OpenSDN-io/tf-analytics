@@ -61,26 +61,18 @@ bool CollectorInfoLogTimer() {
     return false;
 }
 
-bool CollectorVersion(string &version) {
-    return MiscUtils::GetBuildInfo(MiscUtils::Analytics, BuildInfo, version);
-}
-
 bool CollectorSummaryLogger(Collector *collector, const string & hostname,
         OpServerProxy * osp) {
     CollectorState state;
-    static bool first = true, build_info_set = false;
+    static bool first = true;
 
     state.set_name(hostname);
     if (first) {
         vector<string> ip_list;
         ip_list.push_back(Collector::GetSelfIp());
         state.set_self_ip_list(ip_list);
+        state.set_build_info(BuildInfo);
         first = false;
-    }
-    if (!build_info_set) {
-        string build_info_str;
-        build_info_set = CollectorVersion(build_info_str);
-        state.set_build_info(build_info_str);
     }
 
     std::vector<GeneratorSummaryInfo> infos;
