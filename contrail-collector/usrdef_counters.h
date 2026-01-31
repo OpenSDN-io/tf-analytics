@@ -6,7 +6,6 @@
 
 
 #include <map>
-#include <tbb/atomic.h>
 #include <boost/shared_ptr.hpp>
 #include "http/client/vncapi.h"
 #include "parser_util.h"

@@ -34,7 +34,7 @@ ExternalBase::Efn DbQueryUnit::QueryExec(uint32_t inst,
                                 exts[step-1]->begin(),
                                 exts[step-1]->end());
     }
-    res.current_row = cinp.row_count.fetch_and_increment();
+    res.current_row = cinp.row_count.fetch_add(1);
     const uint32_t current_row = res.current_row;
     // continue as long as we have not reached end of rows
     if (current_row < inp.total_rows) {

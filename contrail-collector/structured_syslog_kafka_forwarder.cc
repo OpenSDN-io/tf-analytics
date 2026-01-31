@@ -6,8 +6,7 @@
 #include <utility>
 #include <algorithm>
 
-#include <tbb/mutex.h>
-#include <tbb/atomic.h>
+#include <atomic>
 
 #include <boost/bind.hpp>
 #include <boost/assert.hpp>
@@ -25,7 +24,7 @@ using boost::system::error_code;
 
 class KafkaForwarderDeliveryReportCb : public RdKafka::DeliveryReportCb {
  public:
-  tbb::atomic<size_t> count;
+  std::atomic<size_t> count;
   // This is to count the number of successful
   // kafka operations
   KafkaForwarderDeliveryReportCb() {
@@ -43,7 +42,7 @@ class KafkaForwarderDeliveryReportCb : public RdKafka::DeliveryReportCb {
                 << ": FAILED: " << message.errstr());
         }
     } else {
-        count.fetch_and_increment();
+        count++;
     }
     char * cc = (char *)message.msg_opaque();
     delete[] cc;
@@ -86,7 +85,7 @@ static inline unsigned int djb_hash(const char *str, size_t len) {
 
 class KafkaForwarderPartitionerCb : public RdKafka::PartitionerCb {
   public:
-    tbb::atomic<size_t> count;
+    std::atomic<size_t> count;
     KafkaForwarderPartitionerCb() {
         count = 0;
     }
@@ -98,7 +97,7 @@ class KafkaForwarderPartitionerCb : public RdKafka::PartitionerCb {
         LOG(DEBUG,"KafkaForwarder PartitionerCb key " << key->c_str()  <<
             " len " << key->size() << " count " << partition_cnt << " pt " <<
             pt);
-        count.fetch_and_increment();
+        count++;
         return pt;
     }
 };

@@ -28,6 +28,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <atomic>
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -419,8 +420,8 @@ public:
     int sub_query_id;
     typedef std::vector<query_result_unit_t> q_result;
     struct Input {
-        tbb::atomic<uint32_t> row_count;
-        tbb::atomic<uint32_t> total_rows;
+        std::atomic<uint32_t> row_count;
+        std::atomic<uint32_t> total_rows;
         std::string cf_name;
         GenDb::ColumnNameRange cr;
         GenDb::WhereIndexInfoVec where_vec;

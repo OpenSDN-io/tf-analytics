@@ -5,6 +5,7 @@
 #ifndef _GENERATOR_H_
 #define _GENERATOR_H_
 
+#include <atomic>
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <boost/tuple/tuple.hpp>
@@ -125,7 +126,7 @@ private:
     const std::string name_;
     int instance_;
 
-    tbb::atomic<bool> disconnected_;
+    std::atomic<bool> disconnected_;
     DbHandlerPtr db_handler_;
     GenDb::GenDbIf::DbAddColumnCb process_rules_cb_;
     Timer *sm_defer_timer_;

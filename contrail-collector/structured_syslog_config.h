@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <stdint.h>
 #include <cstdio>
-#include <tbb/atomic.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
 #include <boost/thread/mutex.hpp>
@@ -21,7 +20,6 @@
 #include "parser_util.h"
 
 class Options;
-
 
 
 struct IPNetwork
