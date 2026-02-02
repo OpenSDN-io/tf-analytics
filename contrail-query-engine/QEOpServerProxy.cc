@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
@@ -9,7 +9,7 @@
 #include "base/util.h"
 #include "base/logging.h"
 #include "base/address_util.h"
-#include <tbb/atomic.h>
+#include <atomic>
 #include <cstdlib>
 #include <cerrno>
 #include <utility>
@@ -92,8 +92,32 @@ public:
         uint64_t time_period;
         string table;
         uint32_t max_rows;
-        tbb::atomic<uint32_t> chunk_q;
-        tbb::atomic<uint32_t> total_rows;
+        std::atomic<uint32_t> chunk_q;
+        std::atomic<uint32_t> total_rows;
+
+        // to handle absent operator= for std::atomic
+        Input& operator=(const Input& other) {
+            if (this != &other) {
+                redis_host_idx = other.redis_host_idx;
+                cnum = other.cnum;
+                hostname = other.hostname;
+                qp = other.qp;
+                chunk_size = other.chunk_size;
+                wterms = other.wterms;
+                need_merge = other.need_merge;
+                map_output = other.map_output;
+                where = other.where;
+                select = other.select;
+                post = other.post;
+                time_period = other.time_period;
+                table = other.table;
+                max_rows = other.max_rows;
+                // these two are handled only in QueryExec and are not used in next stages - don't copy they
+                chunk_q = 0;
+                total_rows = 0;
+            }
+            return *this;
+        }
     };
 
     void JsonInsert(std::vector<query_column> &columns,
@@ -121,7 +145,7 @@ public:
                 }
 
                 // find out type and convert
-                if (columns[j].datatype == "string" || 
+                if (columns[j].datatype == "string" ||
                     columns[j].datatype == "uuid")
                 {
                     contrail_rapidjson::Value val(contrail_rapidjson::kStringType);
@@ -152,7 +176,7 @@ public:
                 found = true;
             }
         }
-        assert(found);    
+        assert(found);
     }
 
     void QueryJsonify(const string& table, bool map_output,
@@ -185,7 +209,7 @@ public:
                 raw_json->push_back(jstr);
             }
         } else {
-            QEOpServerProxy::BufferT* raw_result = 
+            QEOpServerProxy::BufferT* raw_result =
                 const_cast<QEOpServerProxy::BufferT*>(raw_res);
             QEOpServerProxy::BufferT::iterator res_it;
             for (res_it = raw_result->begin(); res_it != raw_result->end(); ++res_it) {
@@ -193,7 +217,7 @@ public:
                 contrail_rapidjson::Document dd;
                 dd.SetObject();
 
-                for (map_it = (*res_it).first.begin(); 
+                for (map_it = (*res_it).first.begin();
                      map_it != (*res_it).first.end(); ++map_it) {
                     // search for column name in the schema
                     JsonInsert(columns, dd, &(*map_it));
@@ -203,7 +227,7 @@ public:
                 dd.Accept(writer);
                 raw_json->push_back(sb.GetString());
             }
-        }        
+        }
     }
 
 
@@ -224,7 +248,7 @@ public:
         }
     }
 
-    void QECallback(void * qid, QPerfInfo qperf, unique_ptr<QEOpServerProxy::BufferT> res, 
+    void QECallback(void * qid, QPerfInfo qperf, unique_ptr<QEOpServerProxy::BufferT> res,
             unique_ptr<QEOpServerProxy::OutRowMultimapT> mres) {
 
         RawResultT* raw(new RawResultT);
@@ -241,7 +265,7 @@ public:
             rpi->Response(std::move(rp));
         }
     }
-   
+
     struct Stage0Out {
         Input inp;
         bool ret_code;
@@ -255,13 +279,13 @@ public:
     };
 
     ExternalBase::Efn QueryExec(uint32_t inst, const vector<RawResultT*> & exts,
-            const Input & inp, Stage0Out & res) { 
+            const Input & inp, Stage0Out & res) {
         uint32_t step = exts.size();
 
         if (!step) {
             res.inp = inp;
             res.ret_code = true;
-         
+
             if (inp.map_output)
                 res.mresult = shared_ptr<OutRowMultimapT>(new OutRowMultimapT());
             else
@@ -272,28 +296,25 @@ public:
                 shared_ptr<WhereResultT> ss;
                 res.welem.push_back(ss);
             }
- 
+
             Input& cinp = const_cast<Input&>(inp);
-            res.current_chunk = cinp.chunk_q.fetch_and_increment();
+            res.current_chunk = cinp.chunk_q.fetch_add(1);
             const uint32_t chunknum = res.current_chunk;
-            if (chunknum < inp.chunk_size.size()) {
-
-                string key = "QUERY:" + res.inp.qp.qid;
-
-                // Update query status
-                RedisAsyncConnection * rac = conns_[res.inp.redis_host_idx][res.inp.cnum].get();
-                string rkey = "REPLY:" + res.inp.qp.qid;
-                char stat[40];
-                uint prg = 10 + (chunknum * 75)/inp.chunk_size.size();
-                sprintf(stat,"{\"progress\":%d}", prg);
-                RedisAsyncArgCommand(rac, NULL, 
-                    list_of(string("RPUSH"))(rkey)(stat));
-
-               return boost::bind(&QueryEngine::QueryExecWhere, qosp_->qe_,
-                      _1, inp.qp, chunknum, 0);
-            } else {
+            if (chunknum >= inp.chunk_size.size()) {
                 return NULL;
             }
+
+            // Update query status
+            RedisAsyncConnection * rac = conns_[res.inp.redis_host_idx][res.inp.cnum].get();
+            string rkey = "REPLY:" + res.inp.qp.qid;
+            char stat[40];
+            uint prg = 10 + (chunknum * 75)/inp.chunk_size.size();
+            sprintf(stat,"{\"progress\":%d}", prg);
+            RedisAsyncArgCommand(rac, NULL,
+                list_of(string("RPUSH"))(rkey)(stat));
+
+            return boost::bind(&QueryEngine::QueryExecWhere, qosp_->qe_,
+                    _1, inp.qp, chunknum, 0);
         }
 
         res.ret_info.push_back(exts[step-1]->perf);
@@ -320,7 +341,7 @@ public:
             QE_ASSERT(res.wresult->size() == 0);
             SetOperationUnit::op_or(res.inp.qp.qid, *res.wresult, oterms);
 
-	    for (size_t or_idx=0; or_idx<inp.wterms; or_idx++) {
+	        for (size_t or_idx=0; or_idx<inp.wterms; or_idx++) {
                 res.welem[or_idx].reset();
             }
 
@@ -351,7 +372,7 @@ public:
                 }
                 res.chunk_merge_time.push_back(
                     static_cast<uint32_t>((UTCTimestampUsec() - then)/1000));
-        
+
             } else {
                 // TODO : When merge is not needed, we can just send
                 //        a result upto redis at this point.
@@ -369,17 +390,17 @@ public:
                     added_rows = exts[step-1]->res->size();
                     res.result->insert(res.result->begin(),
                         exts[step-1]->res->begin(),
-                        exts[step-1]->res->end());                        
+                        exts[step-1]->res->end());
                 }
             }
             Input& cinp = const_cast<Input&>(inp);
-            if (cinp.total_rows.fetch_and_add(added_rows) > cinp.max_rows) {
+            if (cinp.total_rows.fetch_add(added_rows) + added_rows > cinp.max_rows) {
                 QE_LOG_NOQID(ERROR,  "QueryExec Max Rows Exceeded " <<
                     cinp.total_rows << " chunk " << cinp.chunk_q);
                 return NULL;
             }
-            
-	    res.current_chunk = cinp.chunk_q.fetch_and_increment();
+
+	        res.current_chunk = cinp.chunk_q.fetch_add(1);
             const uint32_t chunknum = res.current_chunk;
             if (chunknum < inp.chunk_size.size()) {
                 string key = "QUERY:" + res.inp.qp.qid;
@@ -390,13 +411,13 @@ public:
                 char stat[40];
                 uint prg = 10 + (chunknum * 75)/inp.chunk_size.size();
                 sprintf(stat,"{\"progress\":%d}", prg);
-                RedisAsyncArgCommand(rac, NULL, 
-                    list_of(string("RPUSH"))(rkey)(stat));         
+                RedisAsyncArgCommand(rac, NULL,
+                    list_of(string("RPUSH"))(rkey)(stat));
                 return boost::bind(&QueryEngine::QueryExecWhere, qosp_->qe_,
                         _1, inp.qp, chunknum, 0);
             } else {
                 return NULL;
-            }            
+            }
         } else {
             // We are in the middle of doing WHERE processing for a chunk
 
@@ -426,17 +447,17 @@ public:
         res.inp = subs[0]->inp;
         res.fm_time = 0;
 
-        uint32_t total_rows = 0;      
+        uint32_t rows = 0;
         for (vector<shared_ptr<Stage0Out> >::const_iterator it = subs.begin() ;
                 it!=subs.end(); it++) {
             if (res.inp.map_output)
-                total_rows += (*it)->mresult->size();
+                rows += (*it)->mresult->size();
             else
-                total_rows += (*it)->result->size();
+                rows += (*it)->result->size();
         }
 
         // If max_rows have been exceeded, don't do any more processing
-        if (total_rows > res.inp.max_rows) {
+        if (rows > res.inp.max_rows) {
             res.overflow = true;
             return true;
         }
@@ -476,7 +497,7 @@ public:
             uint64_t now = UTCTimestampUsec();
             res.fm_time = static_cast<uint32_t>((now - then)/1000);
         } else {
-            // TODO : If a merge was not needed, results have been sent to 
+            // TODO : If a merge was not needed, results have been sent to
             //        redis already. The only thing still needed is the status
             for (vector<shared_ptr<Stage0Out> >::const_iterator it = subs.begin() ;
                     it!=subs.end(); it++) {
@@ -510,27 +531,26 @@ public:
         switch (inst) {
         case 0: {
                 if (!step)  {
-
                     ret.inp = inp.inp;
                     RedisAsyncConnection * rac = conns_[ret.inp.redis_host_idx][ret.inp.cnum].get();
                     std::stringstream keystr;
                     unique_ptr<QEOutputT> jsonresult(new QEOutputT);
 
-                    QE_LOG_NOQID(INFO,  "Will Jsonify #rows " << 
+                    QE_LOG_NOQID(INFO,  "Will Jsonify #rows " <<
                         inp.result.size() + inp.mresult.size());
                     QueryJsonify(inp.inp.table, inp.inp.map_output,
                         &inp.result, &inp.mresult, jsonresult.get());
-                        
+
                     vector<string> const * const res = jsonresult.get();
                     vector<string>::size_type idx = 0;
                     uint32_t rownum = 0;
 
                     QE_LOG_NOQID(INFO,  "Did Jsonify #rows " << res->size());
-                    
+
                     uint64_t then = UTCTimestampUsec();
                     char stat[80];
                     string key = "REPLY:" + ret.inp.qp.qid;
-                    
+
                     if (inp.overflow) {
                         sprintf(stat,"{\"progress\":%d}", - ENOBUFS);
                     } else if (!inp.ret_code) {
@@ -547,11 +567,11 @@ public:
                                 idx++;
                             }
                             RedisAsyncArgCommand(rac, NULL, command);
-                            RedisAsyncArgCommand(rac, NULL, 
+                            RedisAsyncArgCommand(rac, NULL,
                                 list_of(string("EXPIRE"))(keystr.str())("300"));
                             sprintf(stat,"{\"progress\":90, \"lines\":%d}",
                                 (int)rownum);
-                            RedisAsyncArgCommand(rac, NULL, 
+                            RedisAsyncArgCommand(rac, NULL,
                                 list_of(string("RPUSH"))(key)(stat));
                             rownum++;
                         }
@@ -563,7 +583,7 @@ public:
                     QE_LOG_NOQID(DEBUG,  "QE Query Result is " << stat);
                     return boost::bind(&RedisAsyncArgCommand,
                             conns_[ret.inp.redis_host_idx][ret.inp.cnum].get(), _1,
-                            list_of(string("RPUSH"))(key)(stat));   
+                            list_of(string("RPUSH"))(key)(stat));
                 } else {
                     RedisAsyncConnection * rac = conns_[ret.inp.redis_host_idx][ret.inp.cnum].get();
                     string key = "REPLY:" + ret.inp.qp.qid;
@@ -590,7 +610,7 @@ public:
                     else
                         outsize = inp.result.size();
 
-                    qs.set_rows(static_cast<uint32_t>(outsize));                                           
+                    qs.set_rows(static_cast<uint32_t>(outsize));
                     qs.set_time(qtime);
                     qs.set_qid(ret.inp.qp.qid);
                     qs.set_chunks(inp.inp.chunk_size.size());
@@ -664,7 +684,7 @@ public:
 
 
     typedef WorkPipeline<Input, Stage0Merge, Output> QEPipeT;
-               
+
     void QEPipeCb(QEPipeT *wp, bool ret_code) {
         tbb::mutex::scoped_lock lock(mutex_);
 
@@ -692,7 +712,7 @@ public:
         if (isConnected) {
             string key = "ENGINE:" + hostname_;
             conns_[redis_host_idx][0].get()->RedisAsyncArgCmd(0,
-                    list_of(string("BRPOPLPUSH"))("QUERYQ")(key)("0"));            
+                    list_of(string("BRPOPLPUSH"))("QUERYQ")(key)("0"));
         }
     }
 
@@ -750,7 +770,7 @@ public:
 
         redisReply * reply = (redisReply *) redisCommand(c, "RPUSH %s %s",
             key.c_str(), stat);
-        
+
         freeReplyObject(reply);
         redisFree(c);
     }
@@ -818,8 +838,8 @@ public:
         string key = "QUERY:" + qid;
         redisReply * reply = (redisReply *) redisCommand(c, "hgetall %s",
             key.c_str());
-       
-        map<string,string> terms; 
+
+        map<string,string> terms;
         if (!(c->err) && (reply->type == REDIS_REPLY_ARRAY)) {
             for (uint32_t i=0; i<reply->elements; i+=2) {
                 string idx(reply->element[i]->str);
@@ -827,7 +847,7 @@ public:
                 terms[idx] = val;
             }
         } else {
-            QE_LOG_NOQID(ERROR, "Cannot start Pipleline for " << qid << 
+            QE_LOG_NOQID(ERROR, "Cannot start Pipleline for " << qid <<
                 ". Could not read query input");
             freeReplyObject(reply);
             redisFree(c);
@@ -844,7 +864,7 @@ public:
 
         QueryEngine::QueryParams qp(qid, terms, max_tasks_,
             UTCTimestampUsec());
-       
+
         vector<uint64_t> chunk_size;
         bool need_merge;
         bool map_output;
@@ -868,7 +888,7 @@ public:
 
         if (ret!=0) {
             QueryError(redis_host_idx, qid, ret);
-            QE_LOG_NOQID(ERROR, "Cannot start Pipleline for " << qid << 
+            QE_LOG_NOQID(ERROR, "Cannot start Pipleline for " << qid <<
                 ". Query Parsing Error " << ret);
             qs.set_error("Query Parsing Error");
             QUERY_PERF_INFO_SEND(Sandesh::source(), // name
@@ -911,14 +931,12 @@ public:
             tinfo.push_back(make_pair(0, -1));
         }
 
-        QEPipeT  * wp = new QEPipeT(
-            new WorkStage<Input, Stage0Merge,
-                    RawResultT, Stage0Out>(
+        QEPipeT *wp = new QEPipeT(
+            new WorkStage<Input, Stage0Merge, RawResultT, Stage0Out>(
                 tinfo,
                 boost::bind(&QEOpServerImpl::QueryExec, this, _1,_2,_3,_4),
                 boost::bind(&QEOpServerImpl::QueryMerge, this, _1,_2,_3)),
-            new WorkStage<Stage0Merge, Output,
-                    RedisT>(
+            new WorkStage<Stage0Merge, Output, RedisT>(
                 list_of(make_pair(0,-1))(make_pair(0,-1)),
                 boost::bind(&QEOpServerImpl::QueryResp, this, _1,_2,_3,_4)));
 
@@ -930,21 +948,21 @@ public:
         int conn = LeastLoadedConnection(redis_host_idx);
         QE_LOG_NOQID(DEBUG, "Getting Least Loaded Conn as :" << conn);
         npipes_[redis_host_idx][conn]++;
-        
+
         // The cnum with index 0 is only used for receiving new queries
-        inp.get()->cnum = conn+1; 
+        inp.get()->cnum = conn+1;
         inp.get()->redis_host_idx = redis_host_idx;
 
         wp->Start(boost::bind(&QEOpServerImpl::QEPipeCb, this, wp, _1), inp);
-        QE_LOG_NOQID(DEBUG, "Starting Pipeline for " << qid << " , " << conn+1 << 
+        QE_LOG_NOQID(DEBUG, "Starting Pipeline for " << qid << " , " << conn+1 <<
             " conn, " << tinfo.size() << " tasks");
-        
+
         // Update query status
         RedisAsyncConnection * rac = conns_[redis_host_idx][inp.get()->cnum].get();
         string rkey = "REPLY:" + qid;
         char stat[40];
         sprintf(stat,"{\"progress\":15}");
-        RedisAsyncArgCommand(rac, NULL, 
+        RedisAsyncArgCommand(rac, NULL,
             list_of(string("RPUSH"))(rkey)(stat));
 
 
@@ -1092,7 +1110,7 @@ public:
             //QE_TRACE_NOQID(DEBUG, "Ignoring redis reply");
             return;
         }
-        ExternalProcIf<RedisT> * rpi = 
+        ExternalProcIf<RedisT> * rpi =
                 reinterpret_cast<ExternalProcIf<RedisT> *>(privdata);
         QE_TRACE_NOQID(DEBUG,  " Rx data from REDIS for " << rpi->Key());
 
@@ -1185,7 +1203,7 @@ private:
     static const int kMaxRowThreshold = 10000;
 
     // We always have one connection to receive new queries from OpServer
-    // This is the number of addition connections, which will be 
+    // This is the number of addition connections, which will be
     // used to read query parameters and write query results
     static const uint8_t kConnections = 4;
 
