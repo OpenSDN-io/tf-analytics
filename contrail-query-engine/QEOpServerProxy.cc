@@ -2,20 +2,21 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
-#include <tbb/mutex.h>
+#include <atomic>
+#include <cstdlib>
+#include <cerrno>
+#include <utility>
+#include <list>
+#include <mutex>
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "base/util.h"
 #include "base/logging.h"
 #include "base/address_util.h"
-#include <atomic>
-#include <cstdlib>
-#include <cerrno>
-#include <utility>
 #include "hiredis/hiredis.h"
 #include "hiredis/boostasio.hpp"
-#include <list>
 #include <contrail-collector/redis_connection.h>
 #include "base/work_pipeline.h"
 #include "QEOpServerProxy.h"
@@ -686,7 +687,7 @@ public:
     typedef WorkPipeline<Input, Stage0Merge, Output> QEPipeT;
 
     void QEPipeCb(QEPipeT *wp, bool ret_code) {
-        tbb::mutex::scoped_lock lock(mutex_);
+        std::scoped_lock lock(mutex_);
 
         boost::shared_ptr<Output> res = wp->Result();
         assert(pipes_.find(res->inp.qp.qid)->second == wp);
@@ -786,7 +787,7 @@ public:
 
         uint64_t now = UTCTimestampUsec();
 
-        tbb::mutex::scoped_lock lock(mutex_);
+        std::scoped_lock lock(mutex_);
 
         string redis_host = redis_host_port_pairs_[redis_host_idx].first;
         int redis_port = redis_host_port_pairs_[redis_host_idx].second;
@@ -1194,7 +1195,7 @@ public:
 
     void AddAnalyticsQuery(const std::string &qid,
                            boost::shared_ptr<AnalyticsQuery> q) {
-        tbb::mutex::scoped_lock lock(mutex_);
+        std::scoped_lock lock(mutex_);
         m_analytics_queries[qid].push_back(q);
     }
 
@@ -1219,7 +1220,7 @@ private:
     RedisAsyncConnection::ClientAsyncCmdCbFn **cb_proc_fn_;
     bool **connState_;
 
-    tbb::mutex mutex_;
+    std::mutex mutex_;
     map<string,QEPipeT*> pipes_;
     vector<pair<string, int> > redis_host_port_pairs_;
     int **npipes_;

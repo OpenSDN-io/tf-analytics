@@ -25,21 +25,26 @@
 #ifndef QUERY_H_
 #define QUERY_H_
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <atomic>
 #include <sstream>
 #include <iostream>
 #include <string>
 #include <map>
+#include <mutex>
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <exception>
+#include <cstdlib>
+#include <utility>
+#include <list>
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <exception>
 #include "io/event_manager.h"
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
@@ -49,18 +54,14 @@
 #include "base/task.h"
 #include "base/address.h"
 #include "base/parse_object.h"
-#include <tbb/mutex.h>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/foreach.hpp>
 #include "base/util.h"
 #include "base/logging.h"
-#include <cstdlib>
-#include <utility>
 #include "hiredis/hiredis.h"
 #include "hiredis/boostasio.hpp"
-#include <list>
 #include <contrail-collector/redis_connection.h>
 #include "base/regex.h"
 #include "base/work_pipeline.h"
@@ -533,7 +534,7 @@ public:
         const GenDb::WhereIndexInfoVec &remote_arbitrary_tags_vec);
 
 private:
-    tbb::mutex vector_push_mutex_;
+    std::mutex vector_push_mutex_;
 };
 
 typedef std::vector<std::string> final_result_row_t;
@@ -1059,7 +1060,7 @@ public:
     TtlMap& GetTTlMap() { return ttlmap_; }
     const std::string & keyspace() { return keyspace_; }
     GenDb::DbTableStatistics stable_stats_;
-    mutable tbb::mutex smutex_;
+    mutable std::mutex smutex_;
     bool GetCumulativeStats(std::vector<GenDb::DbTableInfo> *vdbti,
         GenDb::DbErrors *dbe, std::vector<GenDb::DbTableInfo> *vstats_dbti)
         const;

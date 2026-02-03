@@ -5,6 +5,8 @@
 #ifndef DB_HANDLER_H_
 #define DB_HANDLER_H_
 
+#include <mutex>
+
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -280,11 +282,11 @@ private:
     SandeshLevel::type drop_level_;
     VizMsgStatistics dropped_msg_stats_;
     GenDb::DbTableStatistics stable_stats_;
-    mutable tbb::mutex smutex_;
+    mutable std::mutex smutex_;
     TtlMap ttl_map_;
     static uint32_t field_cache_index_;
     static std::set<std::string> field_cache_set_;
-    static tbb::mutex fmutex_;
+    static std::mutex fmutex_;
     std::string tablespace_;
     std::string compaction_strategy_;
     std::string replication_factor_;
@@ -301,8 +303,8 @@ private:
     SandeshLevel::type disk_usage_percentage_drop_level_;
     uint32_t pending_compaction_tasks_;
     SandeshLevel::type pending_compaction_tasks_drop_level_;
-    mutable tbb::mutex disk_usage_percentage_water_mutex_;
-    mutable tbb::mutex pending_compaction_tasks_water_mutex_;
+    mutable std::mutex disk_usage_percentage_water_mutex_;
+    mutable std::mutex pending_compaction_tasks_water_mutex_;
     WaterMarkTuple disk_usage_percentage_watermark_tuple_;
     WaterMarkTuple pending_compaction_tasks_watermark_tuple_;
     SessionTableDbStats session_table_db_stats_;

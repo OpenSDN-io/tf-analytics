@@ -4,13 +4,14 @@
 
 #include "redis_connection.h"
 
-#include <tbb/mutex.h>
+#include <cstdlib>
+#include <mutex>
+
 #include <boost/bind.hpp>
 #include "base/util.h"
 #include "base/address_util.h"
 #include "base/logging.h"
 #include "base/parse_object.h"
-#include <cstdlib>
 #include "hiredis/hiredis.h"
 #include "hiredis/base64.h"
 #include "hiredis/boostasio.hpp"
@@ -20,7 +21,7 @@ using std::vector;
 
 const int RedisAsyncConnection::RedisReconnectTime;
 RedisAsyncConnection::RAC_CbFnsMap RedisAsyncConnection::rac_cb_fns_map_;
-tbb::mutex RedisAsyncConnection::rac_cb_fns_map_mutex_;
+std::mutex RedisAsyncConnection::rac_cb_fns_map_mutex_;
 
 RedisAsyncConnection::RedisAsyncConnection(EventManager *evm, const std::string & redis_ip,
         unsigned short redis_port, ClientConnectCbFn client_connect_cb,
@@ -62,7 +63,7 @@ RedisAsyncConnection::~RedisAsyncConnection() {
 
     if (context_) {
       {
-        tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+        std::scoped_lock lock(rac_cb_fns_map_mutex_);
 
         RedisAsyncConnection::RAC_CbFnsMap& fns_map = 
             RedisAsyncConnection::rac_cb_fns_map();
@@ -98,7 +99,7 @@ void RedisAsyncConnection::RAC_ConnectCallbackProcess(const struct redisAsyncCon
     LOG(DEBUG, "RAC_Connect status: " << status << " " << this);
     if (status != REDIS_OK) {
         if (context_) {
-            tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+            std::scoped_lock lock(rac_cb_fns_map_mutex_);
 
             RedisAsyncConnection::RAC_CbFnsMap& fns_map = 
                 RedisAsyncConnection::rac_cb_fns_map();
@@ -138,7 +139,7 @@ void RedisAsyncConnection::RAC_ConnectCallback(const struct redisAsyncContext *c
     RedisAsyncConnection::RAC_ConnectCbFn fn;
 
       {
-        tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+        std::scoped_lock lock(rac_cb_fns_map_mutex_);
         RedisAsyncConnection::RAC_CbFnsMap& fns_map = RedisAsyncConnection::rac_cb_fns_map();
         RedisAsyncConnection::RAC_CbFnsMap::iterator it = fns_map.find(c);
         if (it == fns_map.end())
@@ -158,7 +159,7 @@ void RedisAsyncConnection::RAC_ConnectCallback(const struct redisAsyncContext *c
 void RedisAsyncConnection::RAC_DisconnectCallbackProcess(const struct redisAsyncContext *c, int status) {
       LOG(DEBUG, "RAC_Disconnect status: " << status << " " << this);
       {
-        tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+        std::scoped_lock lock(rac_cb_fns_map_mutex_);
         RedisAsyncConnection::RAC_CbFnsMap& fns_map = RedisAsyncConnection::rac_cb_fns_map();
         RedisAsyncConnection::RAC_CbFnsMap::iterator it = fns_map.find(context_);
         if (it != fns_map.end())
@@ -176,7 +177,7 @@ void RedisAsyncConnection::RAC_DisconnectCallback(const struct redisAsyncContext
     RedisAsyncConnection::RAC_DisconnectCbFn fn;
 
       {
-        tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+        std::scoped_lock lock(rac_cb_fns_map_mutex_);
         RedisAsyncConnection::RAC_CbFnsMap& fns_map = RedisAsyncConnection::rac_cb_fns_map();
         RedisAsyncConnection::RAC_CbFnsMap::iterator it = fns_map.find(c);
         if (it == fns_map.end()) {
@@ -196,7 +197,7 @@ void RedisAsyncConnection::RAC_DisconnectCallback(const struct redisAsyncContext
 }
 
 bool RedisAsyncConnection::RAC_Connect(void) {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
 
     assert(!context_);
     context_ = redisAsyncConnect(hostname_.c_str(), port_);
@@ -227,7 +228,7 @@ bool RedisAsyncConnection::RAC_Connect(void) {
 
     client_.reset(new redisBoostClient(*evm_->io_service(), context_, mutex_));
 
-    tbb::mutex::scoped_lock fns_lock(rac_cb_fns_map_mutex_);
+    std::scoped_lock fns_lock(rac_cb_fns_map_mutex_);
 
     assert(redisAsyncSetConnectCallback(context_, RedisAsyncConnection::RAC_ConnectCallback) == REDIS_OK);
     RedisAsyncConnection::RAC_CbFnsMap& fns_map = RedisAsyncConnection::rac_cb_fns_map();
@@ -252,7 +253,7 @@ void RedisAsyncConnection::RAC_AsyncCmdCallback(redisAsyncContext *c, void *r, v
     ClientAsyncCmdCbFn cbfn;
     RAC_StatCbFn stat_fn;
     {
-        tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+        std::scoped_lock lock(rac_cb_fns_map_mutex_);
         RedisAsyncConnection::RAC_CbFnsMap& fns_map = RedisAsyncConnection::rac_cb_fns_map();
         RedisAsyncConnection::RAC_CbFnsMap::iterator it = fns_map.find(c);
         if (it == fns_map.end()) {
@@ -293,7 +294,7 @@ void RedisAsyncConnection::RAC_AsyncCmdCallback(redisAsyncContext *c, void *r, v
 }
 
 bool RedisAsyncConnection::SetClientAsyncCmdCb(ClientAsyncCmdCbFn cb_fn) {
-    tbb::mutex::scoped_lock lock(rac_cb_fns_map_mutex_);
+    std::scoped_lock lock(rac_cb_fns_map_mutex_);
     RedisAsyncConnection::RAC_CbFnsMap& fns_map = rac_cb_fns_map();
     RedisAsyncConnection::RAC_CbFnsMap::iterator it = fns_map.find(context_);
 
@@ -310,7 +311,7 @@ bool RedisAsyncConnection::SetClientAsyncCmdCb(ClientAsyncCmdCbFn cb_fn) {
 bool RedisAsyncConnection::RedisAsyncArgCmd(void *rpi,
         const vector<string> &args) {
 
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
 
     if (state_ != REDIS_ASYNC_CONNECTION_CONNECTED) {
         callDisconnected_++;
@@ -346,7 +347,7 @@ bool RedisAsyncConnection::RedisAsyncArgCmd(void *rpi,
 
 
 bool RedisAsyncConnection::RedisAsyncCommand(void *rpi, const char *format, ...) {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
 
     if (state_ != REDIS_ASYNC_CONNECTION_CONNECTED) {
         callDisconnected_++;

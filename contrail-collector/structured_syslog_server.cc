@@ -2220,7 +2220,7 @@ void StructuredSyslogTcpForwarder::WriteReady(const boost::system::error_code &e
         return;
     }
     {
-        tbb::mutex::scoped_lock lock(send_mutex_);
+        std::scoped_lock lock(send_mutex_);
         ready_to_send_ = true;
     }
 }
@@ -2235,7 +2235,7 @@ void StructuredSyslogTcpForwarder::Connect() {
 
 bool StructuredSyslogTcpForwarder::Send(const u_int8_t *data, size_t size, size_t *actual) {
     *actual = 0;
-    tbb::mutex::scoped_lock lock(send_mutex_);
+    std::scoped_lock lock(send_mutex_);
     if (ready_to_send_) {
         ready_to_send_ = session_->Send(data, size, actual);
     }

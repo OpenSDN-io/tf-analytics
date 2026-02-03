@@ -5,6 +5,7 @@
 #ifndef ANALYTICS_STRUCTURED_SYSLOG_SERVER_H_
 #define ANALYTICS_STRUCTURED_SYSLOG_SERVER_H_
 
+#include <mutex>
 #include <vector>
 
 #include <boost/system/error_code.hpp>
@@ -75,7 +76,7 @@ private:
     std::string ipaddress_;
     int port_;
     StructuredSyslogTcpForwarderSession *session_;
-    tbb::mutex send_mutex_;
+    std::mutex send_mutex_;
     bool ready_to_send_;
 
 };

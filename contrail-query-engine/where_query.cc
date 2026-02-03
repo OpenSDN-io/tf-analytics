@@ -1343,7 +1343,7 @@ void WhereQuery::populate_session_where_vec_list(std::vector<GenDb::WhereIndexIn
 void WhereQuery::subquery_processed(QueryUnit *subquery) {
     AnalyticsQuery *m_query = (AnalyticsQuery *)main_query;
     {
-        tbb::mutex::scoped_lock lock(vector_push_mutex_);
+        std::scoped_lock lock(vector_push_mutex_);
         int sub_query_id = ((DbQueryUnit *)subquery)->sub_query_id;
         if (((DbQueryUnit *)subquery)->cfname == g_viz_constants.OBJECT_TABLE) {
             inp.insert(inp.begin(), sub_queries[sub_query_id]->query_result.get());

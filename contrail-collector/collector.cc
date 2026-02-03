@@ -82,7 +82,7 @@ Collector::~Collector() {
 void Collector::SessionShutdown() {
     SandeshServer::SessionShutdown();
 
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     gen_map_.clear();
 }
 
@@ -93,7 +93,7 @@ void Collector::Shutdown() {
 void Collector::RedisUpdate(bool rsc) {
     LOG(INFO, "RedisUpdate " << rsc);
 
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     for (GeneratorMap::iterator gen_it = gen_map_.begin();
             gen_it != gen_map_.end(); gen_it++) {
         SandeshGenerator *gen = gen_it->second;
@@ -215,35 +215,36 @@ bool Collector::ReceiveSandeshCtrlMsg(SandeshStateMachine *state_machine,
             snh->get_module_name(), snh->get_instance_id_name(),
             snh->get_node_type_name()));
     SandeshGenerator *gen;
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
-    GeneratorMap::iterator gen_it = gen_map_.find(id);
-    if (gen_it == gen_map_.end()) {
-        gen = new SandeshGenerator(this, vsession, state_machine, id.get<0>(),
-                id.get<1>(), id.get<2>(), id.get<3>(), db_handler_);
-        gen_map_.insert(id, gen);
-    } else {
-        // Update the generator if needed
-        gen = gen_it->second;
-        VizSession *gsession = gen->session();
-        if (gsession == NULL) {
-            gen->ConnectSession(vsession, state_machine);
+    {
+        // locked block with mutex gen_map_mutex_
+        std::scoped_lock lock(gen_map_mutex_);
+        GeneratorMap::iterator gen_it = gen_map_.find(id);
+        if (gen_it == gen_map_.end()) {
+            gen = new SandeshGenerator(this, vsession, state_machine, id.get<0>(),
+                    id.get<1>(), id.get<2>(), id.get<3>(), db_handler_);
+            gen_map_.insert(id, gen);
         } else {
-            increment_session_mismatch_error();
-            // Message received on different session. Close both.
-            LOG(DEBUG, "Received Ctrl Message: " << gen->ToString()
-                   << " On Session:" << vsession->ToString() <<
-                   " Current Session:" << gsession->ToString());
-            lock.release();
-            // Enqueue a close on the state machine on the generator session
-            gsession->EnqueueClose();
-            return false;
+            // Update the generator if needed
+            gen = gen_it->second;
+            VizSession *gsession = gen->session();
+            if (gsession == NULL) {
+                gen->ConnectSession(vsession, state_machine);
+            } else {
+                increment_session_mismatch_error();
+                // Message received on different session. Close both.
+                LOG(DEBUG, "Received Ctrl Message: " << gen->ToString()
+                    << " On Session:" << vsession->ToString() <<
+                    " Current Session:" << gsession->ToString());
+                // Enqueue a close on the state machine on the generator session
+                gsession->EnqueueClose();
+                return false;
+            }
         }
+        LOG(DEBUG, "Received Ctrl Message: " << gen->ToString()
+                << " Session:" << vsession->ToString());
+        vsession->set_generator(gen);
     }
-    LOG(DEBUG, "Received Ctrl Message: " << gen->ToString()
-            << " Session:" << vsession->ToString());
-    vsession->set_generator(gen);
-    lock.release();
-    
+
     std::vector<UVETypeInfo> vu;
     std::map<std::string, int32_t> seqReply;
     bool retc = osp_->GetSeq(snh->get_source(), snh->get_node_type_name(),
@@ -300,7 +301,7 @@ const std::string Collector::DbGlobalName(bool dup,
 }
 
 void Collector::SendGeneratorStatistics() {
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     for (GeneratorMap::iterator gm_it = gen_map_.begin();
             gm_it != gen_map_.end(); gm_it++) {
         SandeshGenerator *gen = gm_it->second;
@@ -316,7 +317,7 @@ void Collector::SendGeneratorStatistics() {
 
 void Collector::GetGeneratorUVEInfo(vector<ModuleServerState> &genlist) {
     genlist.clear();
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     for (GeneratorMap::const_iterator gm_it = gen_map_.begin();
             gm_it != gen_map_.end(); gm_it++) {
         const SandeshGenerator * const gen = gm_it->second;
@@ -367,7 +368,7 @@ void Collector::GetGeneratorUVEInfo(vector<ModuleServerState> &genlist) {
 
 void Collector::GetGeneratorSummaryInfo(vector<GeneratorSummaryInfo> *genlist) {
     genlist->clear();
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     for (GeneratorMap::const_iterator gm_it = gen_map_.begin();
             gm_it != gen_map_.end(); gm_it++) {
         GeneratorSummaryInfo gsinfo;
@@ -406,7 +407,7 @@ bool Collector::SendRemote(const string& destination, const string& dec_sandesh)
             "Failed to send sandesh request: " << dec_sandesh);
         return false;
     }
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     for (GeneratorMap::const_iterator gm_it = gen_map_.begin();
             gm_it != gen_map_.end(); gm_it++) {
         SandeshGenerator::GeneratorId id(gm_it->first);
@@ -432,7 +433,7 @@ bool Collector::SendRemote(const string& destination, const string& dec_sandesh)
 
 void Collector::SetQueueWaterMarkInfo(QueueType::type type,
     Sandesh::QueueWaterMarkInfo &wm) {
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     GeneratorMap::iterator gen_it = gen_map_.begin();
     for (; gen_it != gen_map_.end(); gen_it++) {
         SandeshGenerator *gen = gen_it->second;
@@ -458,7 +459,7 @@ void Collector::SetSmQueueWaterMarkInfo(Sandesh::QueueWaterMarkInfo &wm) {
 }
 
 void Collector::ResetQueueWaterMarkInfo(QueueType::type type) {
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     GeneratorMap::iterator gen_it = gen_map_.begin();
     for (; gen_it != gen_map_.end(); gen_it++) {
         SandeshGenerator *gen = gen_it->second;
@@ -506,7 +507,7 @@ void Collector::CloseGeneratorSession(string source, string module,
                          string instance, string node_type) {
     SandeshGenerator::GeneratorId id(boost::make_tuple(source,
                               module, instance, node_type));
-    tbb::mutex::scoped_lock lock(gen_map_mutex_);
+    std::scoped_lock lock(gen_map_mutex_);
     GeneratorMap::iterator gen_it = gen_map_.find(id);
     if (gen_it != gen_map_.end()) {
         SandeshGenerator *gen = gen_it->second;

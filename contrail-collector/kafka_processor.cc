@@ -5,7 +5,6 @@
 #include "viz_collector.h"
 #include <analytics/viz_constants.h>
 #include "OpServerProxy.h"
-#include <tbb/mutex.h>
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assert.hpp>

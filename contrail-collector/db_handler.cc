@@ -3,6 +3,7 @@
  */
 
 #include <exception>
+#include <mutex>
 #include <string>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
@@ -59,7 +60,7 @@ using namespace boost::system;
 
 uint32_t DbHandler::field_cache_index_ = 0;
 std::set<std::string> DbHandler::field_cache_set_;
-tbb::mutex DbHandler::fmutex_;
+std::mutex DbHandler::fmutex_;
 
 DbHandler::DbHandler(EventManager *evm,
         GenDb::GenDbIf::DbErrorHandler err_handler,
@@ -229,7 +230,7 @@ void DbHandler::SetDiskUsagePercentageLowWaterMark(
 }
 
 void DbHandler::ProcessDiskUsagePercentage(uint32_t disk_usage_percentage) {
-    tbb::mutex::scoped_lock lock(disk_usage_percentage_water_mutex_);
+    std::scoped_lock lock(disk_usage_percentage_water_mutex_);
     disk_usage_percentage_watermark_tuple_.ProcessWaterMarks(
                                         disk_usage_percentage,
                                         DbHandler::disk_usage_percentage_);
@@ -264,7 +265,7 @@ void DbHandler::SetPendingCompactionTasksLowWaterMark(
 
 void DbHandler::ProcessPendingCompactionTasks(
                                     uint32_t pending_compaction_tasks) {
-    tbb::mutex::scoped_lock lock(pending_compaction_tasks_water_mutex_);
+    std::scoped_lock lock(pending_compaction_tasks_water_mutex_);
     pending_compaction_tasks_watermark_tuple_.ProcessWaterMarks(
                                     pending_compaction_tasks,
                                     DbHandler::pending_compaction_tasks_);
@@ -275,7 +276,7 @@ bool DbHandler::DropMessage(const SandeshHeader &header,
     SandeshType::type stype(header.get_Type());
     // If Flow message, drop it
     if (stype == SandeshType::FLOW) {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         dropped_msg_stats_.Update(vmsg);
         return true;
     }
@@ -288,7 +289,7 @@ bool DbHandler::DropMessage(const SandeshHeader &header,
     SandeshLevel::type slevel(static_cast<SandeshLevel::type>(
         header.get_Level()));
     if (slevel >= drop_level_) {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         dropped_msg_stats_.Update(vmsg);
         return true;
     }
@@ -311,7 +312,7 @@ bool DbHandler::DropMessage(const SandeshHeader &header,
 
     bool drop(disk_usage_percentage_drop || pending_compaction_tasks_drop);
     if (drop) {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         dropped_msg_stats_.Update(vmsg);
     }
     return drop;
@@ -614,7 +615,7 @@ void DbHandler::GetSandeshStats(std::string *drop_level,
     std::vector<SandeshStats> *vdropmstats) const {
     *drop_level = Sandesh::LevelToString(drop_level_);
     if (vdropmstats) {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         dropped_msg_stats_.Get(vdropmstats);
     }
 }
@@ -626,7 +627,7 @@ bool DbHandler::GetStats(uint64_t *queue_count, uint64_t *enqueues) const {
 bool DbHandler::GetStats(std::vector<GenDb::DbTableInfo> *vdbti,
     GenDb::DbErrors *dbe, std::vector<GenDb::DbTableInfo> *vstats_dbti) {
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.GetDiffs(vstats_dbti);
     }
     return dbif_->Db_GetStats(vdbti, dbe);
@@ -635,7 +636,7 @@ bool DbHandler::GetStats(std::vector<GenDb::DbTableInfo> *vdbti,
 bool DbHandler::GetCumulativeStats(std::vector<GenDb::DbTableInfo> *vdbti,
     GenDb::DbErrors *dbe, std::vector<GenDb::DbTableInfo> *vstats_dbti) const {
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.GetCumulative(vstats_dbti);
     }
     return dbif_->Db_GetCumulativeStats(vdbti, dbe);
@@ -830,7 +831,7 @@ void DbHandler::FieldNamesTableInsert(uint64_t timestamp,
     fc_entry.append(":");
     fc_entry.append(field_val);
     {
-        tbb::mutex::scoped_lock lock(fmutex_);
+        std::scoped_lock lock(fmutex_);
         record = CanRecordDataForT2(temp_u32, fc_entry);
     }
 
@@ -990,11 +991,11 @@ bool DbHandler::StatTableWrite(uint32_t t2, const std::string& statName,
         DB_LOG(ERROR, "Addition of " << statName <<
                 ", " << statAttr << " into table " <<
                 g_viz_constants.STATS_TABLE <<" FAILED");
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.Update(statName + ":" + statAttr, true, true, false, 1);
         return false;
     } else {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.Update(statName + ":" + statAttr, true, false, false, 1);
         return true;
     }
@@ -1669,7 +1670,7 @@ bool DbHandler::SessionTableInsert(const pugi::xml_node &parent,
 
 bool DbHandler::GetSessionTableDbInfo(SessionTableDbInfo *session_table_info) {
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         if (session_table_db_stats_.num_messages == 0) {
             return true;
         }

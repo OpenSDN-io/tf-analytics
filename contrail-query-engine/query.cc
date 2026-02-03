@@ -1336,7 +1336,7 @@ bool QueryEngine::GetCumulativeStats(std::vector<GenDb::DbTableInfo> *vdbti,
         GenDb::DbErrors *dbe, std::vector<GenDb::DbTableInfo> *vstats_dbti)
         const {
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.GetCumulative(vstats_dbti);
     }
     return dbif_->Db_GetCumulativeStats(vdbti, dbe);
@@ -1534,7 +1534,7 @@ void TraceStatusReq::HandleRequest() const {
 bool QueryEngine::GetDiffStats(std::vector<GenDb::DbTableInfo> *vdbti,
     GenDb::DbErrors *dbe, std::vector<GenDb::DbTableInfo> *vstats_dbti) {
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         stable_stats_.GetDiffs(vstats_dbti);
     }
     return dbif_->Db_GetStats(vdbti, dbe);

@@ -27,6 +27,7 @@
 
 #include <analytics/viz_constants.h>
 #include "generator.h"
+#include <mutex>
 #include <string>
 #include <analytics/collector_uve_types.h>
 #include "db_handler.h"
@@ -152,7 +153,7 @@ private:
 
     // SandeshGenerator map
     typedef boost::ptr_map<SandeshGenerator::GeneratorId, SandeshGenerator> GeneratorMap;
-    mutable tbb::mutex gen_map_mutex_;
+    mutable std::mutex gen_map_mutex_;
     GeneratorMap gen_map_;
 
     // Random generator for UUIDs

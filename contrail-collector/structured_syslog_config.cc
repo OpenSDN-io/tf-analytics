@@ -162,7 +162,7 @@ StructuredSyslogConfig::AddNetwork(const std::string& key, const std::string& ne
 
     std::string id = location;
     IPNetwork net(net_lower, net_upper, id);
-    boost::mutex::scoped_lock lock(networks_map_refresh_mutex);
+    std::scoped_lock lock(networks_map_refresh_mutex);
 
     IPNetworks_map::iterator it = networks_map_.find(key);
     if (it  != networks_map_.end()) {
@@ -184,7 +184,7 @@ StructuredSyslogConfig::AddNetwork(const std::string& key, const std::string& ne
 bool
 StructuredSyslogConfig::RefreshNetworksMap(const std::string location){
 
-    boost::mutex::scoped_lock lock(networks_map_refresh_mutex);
+    std::scoped_lock lock(networks_map_refresh_mutex);
     for(IPNetworks_map::iterator it = networks_map_.begin(); it != networks_map_.end(); it++){
         std::vector<int> indexes_to_be_deleted;
         for(IPNetworks::iterator i = it->second.begin(); i != it->second.end(); i++) {

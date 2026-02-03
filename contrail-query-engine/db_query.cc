@@ -309,7 +309,7 @@ void DbQueryUnit::cb(GenDb::DbOpResult::type dresult,
        ExternalProcIf<q_result> * rpi(
            reinterpret_cast<ExternalProcIf<q_result> *>(privdata));
        if (m_query->is_stat_table_query(m_query->table())) {
-            tbb::mutex::scoped_lock lock(qe->smutex_);
+            std::scoped_lock lock(qe->smutex_);
             qe->stable_stats_.Update(m_query->stat_name_attr, false, true,
                 false, 1);
        }
@@ -318,7 +318,7 @@ void DbQueryUnit::cb(GenDb::DbOpResult::type dresult,
     }
     // Update the reads against the stat
     if (m_query->is_stat_table_query(m_query->table())) {
-        tbb::mutex::scoped_lock lock(qe->smutex_);
+        std::scoped_lock lock(qe->smutex_);
         qe->stable_stats_.Update(m_query->stat_name_attr, false, false,
             false, 1);
     }

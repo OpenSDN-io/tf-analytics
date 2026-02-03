@@ -2,6 +2,7 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
+#include <mutex>
 #include <pthread.h>
 
 #include <boost/bind.hpp>
@@ -858,7 +859,7 @@ class UUIDRandomGenTest : public ::testing::Test {
     std::string GenerateUUID(bool lock, bool rgen_on_stack) {
         boost::uuids::uuid uuid;
         if (lock) {
-            tbb::mutex::scoped_lock lock(rgen_mutex_);
+            std::scoped_lock lock(rgen_mutex_);
             if (rgen_on_stack) {
                 uuid = boost::uuids::random_generator()();
             } else {
@@ -876,7 +877,7 @@ class UUIDRandomGenTest : public ::testing::Test {
         return ss.str();
     }
 
-    tbb::mutex rgen_mutex_;
+    std::mutex rgen_mutex_;
     boost::uuids::random_generator rgen_;
 };
 

@@ -2,21 +2,22 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
+#include <set>
+#include <cstdlib>
+#include <utility>
+#include <algorithm>
+#include <mutex>
+#include <iterator>
+
 #include "viz_collector.h"
 #include "viz_constants.h"
 #include "OpServerProxy.h"
-#include <tbb/mutex.h>
 #include <boost/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assert.hpp>
 #include "base/util.h"
 #include "base/logging.h"
 #include "base/parse_object.h"
-#include <set>
-#include <cstdlib>
-#include <utility>
-#include <algorithm>
-#include <iterator>
 #include "hiredis/hiredis.h"
 #include "hiredis/base64.h"
 #include "hiredis/boostasio.hpp"
@@ -150,7 +151,7 @@ class OpServerProxy::OpServerImpl {
         };
 
         void FillRedisUVEInfo(RedisUveInfo& redis_uve_info) {
-            tbb::mutex::scoped_lock lock(rac_mutex_); 
+            std::scoped_lock lock(rac_mutex_); 
             redis_uve_info = redis_uve_.rinfo_;
             if (to_ops_conn_) {
                 redis_uve_info.set_conn_call_disconnected(to_ops_conn_->CallDisconnected());
@@ -194,7 +195,7 @@ class OpServerProxy::OpServerImpl {
             redisReply reply = *reinterpret_cast<redisReply*>(r);
             if (reply.type != REDIS_REPLY_ERROR) {
                 {
-                   tbb::mutex::scoped_lock lock(rac_mutex_);
+                   std::scoped_lock lock(rac_mutex_);
                    redis_uve_.RedisStatusUpdate(RAC_UP);
                 }
                 ConnectionState::GetInstance()->Update(ConnectionType::REDIS_UVE,
@@ -286,7 +287,7 @@ class OpServerProxy::OpServerImpl {
         void ToOpsConnDown() {
             LOG(DEBUG, "ToOpsConnDown.. DOWN.. Reconnect..");
             {
-                tbb::mutex::scoped_lock lock(rac_mutex_);
+                std::scoped_lock lock(rac_mutex_);
                 redis_uve_.RedisStatusUpdate(RAC_DOWN);
             }
             started_ = false;
@@ -405,12 +406,12 @@ class OpServerProxy::OpServerImpl {
         }
 
         shared_ptr<RedisAsyncConnection> to_ops_conn() {
-            tbb::mutex::scoped_lock lock(rac_mutex_);
+            std::scoped_lock lock(rac_mutex_);
             return to_ops_conn_;
         }
 
         shared_ptr<RedisAsyncConnection> from_ops_conn() {
-            tbb::mutex::scoped_lock lock(rac_mutex_);
+            std::scoped_lock lock(rac_mutex_);
             return from_ops_conn_;
         }
 
@@ -484,7 +485,7 @@ class OpServerProxy::OpServerImpl {
         shared_ptr<RedisAsyncConnection> from_ops_conn_;
         RedisAsyncConnection::ClientAsyncCmdCbFn analytics_cb_proc_fn;
         RedisAsyncConnection::ClientAsyncCmdCbFn processor_cb_proc_fn;
-        tbb::mutex rac_mutex_;
+        std::mutex rac_mutex_;
         const std::string redis_password_;
 };
 

@@ -6,6 +6,7 @@
 #define _GENERATOR_H_
 
 #include <atomic>
+#include <mutex>
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <boost/tuple/tuple.hpp>
@@ -42,7 +43,7 @@ private:
     void UpdateStatistics(const VizMsg *vmsg);
 
     VizMsgStatistics statistics_;
-    mutable tbb::mutex smutex_;
+    mutable std::mutex smutex_;
 };
 
 class SandeshGenerator : public Generator {
@@ -74,7 +75,7 @@ public:
     const std::string &instance_id() const { return instance_id_; }
     const std::string &node_type() const { return node_type_; }
     VizSession * session() const {
-        tbb::mutex::scoped_lock lock(mutex_);
+        std::scoped_lock lock(mutex_);
         return viz_session_;
     }
     const std::string &module() const { return module_; }
@@ -132,7 +133,7 @@ private:
     Timer *sm_defer_timer_;
     uint64_t sm_defer_timer_expiry_time_usec_;
     int sm_defer_time_msec_;
-    mutable tbb::mutex mutex_;
+    mutable std::mutex mutex_;
 };
 
 class SyslogGenerator : public Generator {

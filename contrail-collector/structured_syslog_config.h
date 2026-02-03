@@ -435,7 +435,7 @@ class StructuredSyslogConfig {
         Csr_t sla_profile_records_;
 
         //networks_map_refresh_mutex should be used only to refresh networks map
-        boost::mutex networks_map_refresh_mutex;
+        std::mutex networks_map_refresh_mutex;
         IPNetworks_map networks_map_;
         SyslogSessionConfig session_config_map_;
         uint64_t activeSessionConfigMapLIMIT;

@@ -47,24 +47,24 @@ using std::map;
     } while (false)
 
 void Generator::UpdateStatistics(const VizMsg *vmsg) {
-    tbb::mutex::scoped_lock lock(smutex_);
+    std::scoped_lock lock(smutex_);
     statistics_.Update(vmsg);
 }
 
 void Generator::GetStatistics(vector<SandeshStats> *ssv) const {
-    tbb::mutex::scoped_lock lock(smutex_);
+    std::scoped_lock lock(smutex_);
     statistics_.Get(ssv);
 }
 
 void Generator::GetStatistics(vector<SandeshLogLevelStats> *lsv) const {
-    tbb::mutex::scoped_lock lock(smutex_);
+    std::scoped_lock lock(smutex_);
     statistics_.Get(lsv);
 }
 
 void Generator::SendSandeshMessageStatistics() {
     vector<SandeshMessageInfo> smv;
     {
-        tbb::mutex::scoped_lock lock(smutex_);
+        std::scoped_lock lock(smutex_);
         statistics_.Get(&smv);
     }
     SandeshMessageStat * snh = SANDESH_MESSAGE_STAT_CREATE();
@@ -137,7 +137,7 @@ void SandeshGenerator::ReceiveSandeshCtrlMsg(uint32_t connects) {
 }
 
 void SandeshGenerator::DisconnectSession(VizSession *vsession) {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     GENERATOR_LOG(INFO, "Session:" << vsession->ToString());
     if (vsession == viz_session_) {
         disconnected_ = true;
@@ -166,7 +166,7 @@ void SandeshGenerator::DisconnectSession(VizSession *vsession) {
 }
 
 bool SandeshGenerator::StateMachineDeferTimerExpired() {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     sm_defer_timer_expiry_time_usec_ = UTCTimestampUsec();
     if (state_machine_) {
         state_machine_->SetDeferDequeue(false);
@@ -207,12 +207,12 @@ bool SandeshGenerator::IsStateMachineDeferTimerRunningUnlocked() const {
 }
 
 bool SandeshGenerator::IsStateMachineDeferTimerRunning() const {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     return IsStateMachineDeferTimerRunningUnlocked();
 }
 
 int SandeshGenerator::GetStateMachineDeferTimeMSec() const {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     return sm_defer_time_msec_;
 }
 
@@ -245,7 +245,7 @@ int GetDeferTimeMSec(uint64_t event_time_usec,
 }
 
 void SandeshGenerator::ProcessRulesCb(GenDb::DbOpResult::type dresult) {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     if (dresult == GenDb::DbOpResult::BACK_PRESSURE) {
         if (state_machine_) {
             // If state mchine defer timer is running just return to
@@ -316,7 +316,7 @@ const std::string SandeshGenerator::State() const {
 
 void SandeshGenerator::ConnectSession(VizSession *session,
     SandeshStateMachine *state_machine) {
-    tbb::mutex::scoped_lock lock(mutex_);
+    std::scoped_lock lock(mutex_);
     set_session(session);
     set_state_machine(state_machine);
     disconnected_ = false;

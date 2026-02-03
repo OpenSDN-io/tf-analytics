@@ -5,11 +5,12 @@
 #ifndef __REDIS_CONNECTION__H__
 #define __REDIS_CONNECTION__H__
 
+#include <mutex>
 #include <string>
+
 #include <boost/asio.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
-#include <tbb/mutex.h>
 #include "hiredis/hiredis.h"
 #include "hiredis/async.h"
 #include "hiredis/boostasio.hpp"
@@ -101,7 +102,7 @@ private:
     redisAsyncContext *context_;
     //boost::scoped_ptr<redisBoostClient> client_;
     boost::shared_ptr<redisBoostClient> client_;
-    tbb::mutex mutex_;
+    std::mutex mutex_;
     RedisState state_;
     boost::asio::deadline_timer reconnect_timer_;
 
@@ -133,7 +134,7 @@ private:
     static void RAC_AsyncCmdCallback(redisAsyncContext *c, void *r, void *privdata);
 
     static RAC_CbFnsMap rac_cb_fns_map_;
-    static tbb::mutex rac_cb_fns_map_mutex_;
+    static std::mutex rac_cb_fns_map_mutex_;
 
     boost::asio::ip::tcp::endpoint endpoint_;
 };
