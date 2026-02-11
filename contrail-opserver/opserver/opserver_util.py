@@ -14,7 +14,6 @@ import os
 import datetime
 import time
 import requests
-import pkg_resources
 import xmltodict
 import json
 import gevent
@@ -505,16 +504,8 @@ class OpServerUtils(object):
         if headers:
             hdrs.update(headers)
         try:
-            if int(pkg_resources.get_distribution("requests").version[0]) != 0:
-                response = requests.post(url, stream=stm,
-                                         data=params,
-                                         auth=HTTPBasicAuth(user, password),
-                                         headers=hdrs)
-            else:
-                response = requests.post(url, prefetch=pre,
-                                         data=params,
-                                         auth=HTTPBasicAuth(user, password),
-                                         headers=hdrs)
+            response = requests.post(
+                url, stream=stm, data=params, auth=HTTPBasicAuth(user, password), headers=hdrs)
         except requests.exceptions.ConnectionError as e:
             print("Connection to %s failed %s" % (url, str(e)))
             return None
@@ -529,16 +520,9 @@ class OpServerUtils(object):
     def get_url_http(url, user, password, headers=None, cert=None, ca_cert=None):
         data = {}
         try:
-            if int(pkg_resources.get_distribution("requests").version[0]) != 0:
-                data = requests.get(url, stream=True,
-                                    auth=HTTPBasicAuth(user, password),
-                                    cert=cert,
-                                    verify=ca_cert,
-                                    headers=headers)
-            else:
-                data = requests.get(url, prefetch=False,
-                                    auth=HTTPBasicAuth(user, password),
-                                    cert=cert, verify=ca_cert, headers=headers)
+            data = requests.get(
+                url, stream=True, auth=HTTPBasicAuth(user, password),
+                cert=cert, verify=ca_cert, headers=headers)
         except requests.exceptions.ConnectionError as e:
             print("Connection to %s failed %s" % (url, str(e)))
 
