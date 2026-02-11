@@ -1,6 +1,6 @@
 // actual google test classes
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/list_of.hpp>
@@ -19,6 +19,7 @@
 using ::testing::_;
 using ::testing::Return;
 using ::testing::AnyNumber;
+using namespace boost::placeholders;
 
 TtlMap ttl_map = g_viz_constants.TtlValuesDefault;
 

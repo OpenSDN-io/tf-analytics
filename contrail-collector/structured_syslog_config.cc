@@ -12,7 +12,7 @@
 #include "structured_syslog_config.h"
 #include "options.h"
 #include <base/logging.h>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -21,6 +21,7 @@ using boost::regex_error;
 using contrail::regex;
 using contrail::regex_match;
 using contrail::regex_search;
+using namespace boost::placeholders;
 
 StructuredSyslogConfig::StructuredSyslogConfig(ConfigClientCollector *config_client, uint64_t structured_syslog_active_session_map_limit) {
     activeSessionConfigMapLIMIT = structured_syslog_active_session_map_limit;

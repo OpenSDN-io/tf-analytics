@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <mutex>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "base/util.h"
 #include "base/address_util.h"
 #include "base/logging.h"
@@ -18,6 +18,7 @@
 
 using std::string;
 using std::vector;
+using namespace boost::placeholders;
 
 const int RedisAsyncConnection::RedisReconnectTime;
 RedisAsyncConnection::RAC_CbFnsMap RedisAsyncConnection::rac_cb_fns_map_;

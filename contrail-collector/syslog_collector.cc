@@ -8,7 +8,7 @@
 #include <map>
 
 #include <boost/array.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/spirit/include/qi.hpp>
@@ -55,6 +55,7 @@ namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::standard;
 namespace bt = boost::posix_time;
 namespace phx = boost::phoenix;
+using namespace boost::placeholders;
 
 
 class SyslogQueueEntry;

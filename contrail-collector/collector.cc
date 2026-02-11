@@ -4,7 +4,7 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/array.hpp>
@@ -39,6 +39,7 @@ using boost::system::error_code;
 using process::ConnectionState;
 using process::ConnectionType;
 using process::ConnectionStatus;
+using namespace boost::placeholders;
 
 
 std::string Collector::prog_name_;

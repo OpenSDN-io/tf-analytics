@@ -8,7 +8,7 @@
 
 #include <atomic>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assert.hpp>
 
 #include <base/time_util.h>
@@ -21,6 +21,7 @@
 using std::map;
 using std::string;
 using boost::system::error_code;
+using namespace boost::placeholders;
 
 class KafkaForwarderDeliveryReportCb : public RdKafka::DeliveryReportCb {
  public:

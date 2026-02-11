@@ -9,7 +9,7 @@
 #include <boost/assign/list_of.hpp>
 #include <exception>
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include "base/task.h"
 #include "base/parse_object.h"
@@ -18,6 +18,8 @@
 #include "query.h"
 #include "stats_query.h"
 #include "database/cassandra/cql/cql_if.h"
+
+using namespace boost::placeholders;
 
 class CdbIfMock : public cass::cql::CqlIf {
 public:

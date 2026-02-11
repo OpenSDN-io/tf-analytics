@@ -4,7 +4,7 @@
 
 #include "viz_collector.h"
 #include <boost/lexical_cast.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <iostream>
 #include <vector>
 
@@ -32,6 +32,7 @@ using std::map;
 using std::make_pair;
 using boost::system::error_code;
 using namespace zookeeper::client;
+using namespace boost::placeholders;
 
 VizCollector::VizCollector(EventManager *evm, unsigned short listen_port,
             const std::string &listen_ip,
