@@ -6,7 +6,8 @@
 #define __DH_HANDLER_MOCK_H__
 
 #include "db_handler.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
+using namespace boost::placeholders;
 
 class DbHandlerMock : public DbHandler {
   public:

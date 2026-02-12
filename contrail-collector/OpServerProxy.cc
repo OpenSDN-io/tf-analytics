@@ -12,7 +12,7 @@
 #include "viz_collector.h"
 #include "viz_constants.h"
 #include "OpServerProxy.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assert.hpp>
 #include "base/util.h"
@@ -49,6 +49,7 @@ using boost::system::error_code;
 using process::ConnectionState;
 using process::ConnectionType;
 using process::ConnectionStatus;
+using namespace boost::placeholders;
 
 
 static inline unsigned int djb_hash (const char *str, size_t len) {

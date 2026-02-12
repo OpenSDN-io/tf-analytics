@@ -5,7 +5,7 @@
 #include <exception>
 #include <mutex>
 #include <string>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/uuid/name_generator.hpp>
@@ -35,6 +35,8 @@
 #include "parser_util.h"
 #include "db_handler_impl.h"
 #include "viz_sandesh.h"
+
+using namespace boost::placeholders;
 
 #define DB_LOG(_Level, _Msg)                                                   \
     do {                                                                       \

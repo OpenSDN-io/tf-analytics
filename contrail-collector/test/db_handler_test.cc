@@ -5,7 +5,7 @@
 #include <mutex>
 #include <pthread.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/ptr_list_of.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -26,6 +26,7 @@
 #include "contrail-collector/test/cql_if_mock.h"
 #include "contrail-collector/test/usrdef_counters_mock.h"
 
+using namespace boost::placeholders;
 using ::testing::Return;
 using ::testing::Field;
 using ::testing::AnyOf;

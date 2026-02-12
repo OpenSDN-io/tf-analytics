@@ -2,8 +2,10 @@
  * Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
  */
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "../OpServerProxy.h"
+
+using namespace boost::placeholders;
 
 class OpServerProxyMock : public OpServerProxy {
 public:

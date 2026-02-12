@@ -5,7 +5,7 @@
 #include "viz_collector.h"
 #include <analytics/viz_constants.h>
 #include "OpServerProxy.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/assert.hpp>
 #include "base/util.h"
@@ -44,6 +44,7 @@ using boost::system::error_code;
 using process::ConnectionState;
 using process::ConnectionType;
 using process::ConnectionStatus;
+using namespace boost::placeholders;
 
 class KafkaDeliveryReportCb : public RdKafka::DeliveryReportCb {
  public:

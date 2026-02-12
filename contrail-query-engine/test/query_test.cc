@@ -112,7 +112,7 @@ bool CdbIfMock::Db_GetMultiRow(GenDb::ColListVec *col_list,
 
 
 // actual google test classes
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/list_of.hpp>
 #include "testing/gunit.h"
@@ -125,6 +125,7 @@ using ::testing::AnyNumber;
 using ::testing::_;
 using ::testing::Eq;
 using ::testing::ElementsAre;
+using namespace boost::placeholders;
 
 class AnalyticsQueryTest: public ::testing::Test {
 public:

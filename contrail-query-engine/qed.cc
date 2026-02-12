@@ -17,7 +17,7 @@
 #include "base/connection_info.h"
 #include "io/event_manager.h"
 #include "QEOpServerProxy.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <sandesh/common/vns_types.h>
 #include <sandesh/common/vns_constants.h>
@@ -48,6 +48,7 @@ using process::ConnectionType;
 using process::ConnectionTypeName;
 using process::g_process_info_constants;
 using process::Signal;
+using namespace boost::placeholders;
 
 // This is to force qed to wait for a gdbattach
 // before proceeding.

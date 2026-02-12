@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 #include <map>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "base/timer.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/assign/list_of.hpp>
@@ -33,6 +33,7 @@ using std::string;
 using std::pair;
 using std::vector;
 using std::map;
+using namespace boost::placeholders;
 
 #define GENERATOR_LOG(_Level, _Msg)                                            \
     do {                                                                       \

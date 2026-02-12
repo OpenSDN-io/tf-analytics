@@ -46,7 +46,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include "io/event_manager.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
@@ -54,11 +54,9 @@
 #include "base/task.h"
 #include "base/address.h"
 #include "base/parse_object.h"
-#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/foreach.hpp>
-#include "base/util.h"
 #include "base/logging.h"
 #include "hiredis/hiredis.h"
 #include "hiredis/boostasio.hpp"
@@ -70,7 +68,6 @@
 #include <contrail-collector/viz_message.h>
 #include "json_parse.h"
 #include "QEOpServerProxy.h"
-#include "base/logging.h"
 #include <sandesh/sandesh_ctrl_types.h>
 #include <sandesh/sandesh_trace.h>
 #include <sandesh/common/vns_constants.h>
@@ -79,6 +76,8 @@
 #include <query_engine/qe_types.h>
 #include "rapidjson/document.h"
 #include <boost/shared_ptr.hpp>
+
+using namespace boost::placeholders;
 
 extern std::map< std::string, int > trace_enable_map;
 #define IS_TRACE_ENABLED(trace_flag_string) \

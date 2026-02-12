@@ -13,7 +13,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/name_generator.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #if __GNUC_PREREQ(4, 6)
 #pragma GCC diagnostic push
@@ -40,6 +40,8 @@
 #include "config_client_collector.h"
 #include "usrdef_counters.h"
 #include "options.h"
+
+using namespace boost::placeholders;
 
 class Options;
 

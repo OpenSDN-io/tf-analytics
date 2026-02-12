@@ -9,7 +9,7 @@
 #include <list>
 #include <mutex>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/tuple/tuple.hpp>
 #include "base/util.h"
@@ -46,6 +46,7 @@ using process::ConnectionState;
 using process::ConnectionType;
 using process::ConnectionStatus;
 using process::Endpoint;
+using namespace boost::placeholders;
 
 extern RedisAsyncConnection * rac_alloc(EventManager *, const std::string & ,unsigned short,
 RedisAsyncConnection::ClientConnectCbFn ,
