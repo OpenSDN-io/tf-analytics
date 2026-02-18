@@ -75,6 +75,8 @@ AnalyticsEnv.Prepend(LIBS=[
     'misc',
     'sandeshvns',
     'pugixml',
+    'hiredis_boostasio',
+    'hiredis_ssl',
     'hiredis',
     'protobuf',
     'zookeeper_client',
@@ -91,6 +93,10 @@ AnalyticsEnv.Prepend(LIBS=[
     'rabbitmq',
     'rdkafka++',
     'rdkafka'])
+
+# libhiredis_ssl needs symbols from libhiredis; group link so they resolve on all linkers
+AnalyticsEnv.Append(LINKFLAGS=['-Wl,--start-group', '-lhiredis_boostasio', '-lhiredis_ssl', '-lhiredis', '-Wl,--end-group'])
+AnalyticsEnv.Append(LIBPATH=['/usr/lib64', '/usr/lib'])
 
 AnalyticsEnv.Prepend(LIBS=['lz4'])
 

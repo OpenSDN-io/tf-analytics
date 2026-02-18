@@ -16,6 +16,7 @@
 #include "base/logging.h"
 #include "base/address_util.h"
 #include "hiredis/hiredis.h"
+#include "hiredis/hiredis_ssl.h"
 #include "hiredis/boostasio.hpp"
 #include <contrail-collector/redis_connection.h>
 #include "base/work_pipeline.h"
@@ -743,14 +744,30 @@ public:
 
         /* Secure the connection if SSL enabled */
         if (redis_ssl_enable_) {
-            int rc = redisSecureConnection(c, redis_ca_cert_.c_str(),
-                      redis_certfile_.c_str(), redis_keyfile_.c_str(), "sni");
-            if (rc != REDIS_OK) {
+            redisSSLContextError ssl_error = REDIS_SSL_CTX_NONE;
+            redisSSLContext *ssl_ctx = redisCreateSSLContext(
+                redis_ca_cert_.c_str(),
+                NULL,
+                redis_certfile_.c_str(),
+                redis_keyfile_.c_str(),
+                "sni",
+                &ssl_error);
+            if (!ssl_ctx || ssl_error != REDIS_SSL_CTX_NONE) {
                 QE_LOG_NOQID(ERROR, "Cannot report query error for " << qid <<
-                             " SSL Connection Error: " << c->errstr);
+                             " SSL Context Error: " << redisSSLContextGetError(ssl_error));
+                if (ssl_ctx) redisFreeSSLContext(ssl_ctx);
                 redisFree(c);
                 return;
             }
+            int rc = redisInitiateSSLWithContext(c, ssl_ctx);
+            if (rc != REDIS_OK) {
+                QE_LOG_NOQID(ERROR, "Cannot report query error for " << qid <<
+                             " SSL Connection Error: " << c->errstr);
+                redisFreeSSLContext(ssl_ctx);
+                redisFree(c);
+                return;
+            }
+            redisFreeSSLContext(ssl_ctx);
         }
 
         //Authenticate the context with password
@@ -808,16 +825,34 @@ public:
 
         /* Secure the connection if SSL enabled */
         if (redis_ssl_enable_) {
-            int rc = redisSecureConnection(c, redis_ca_cert_.c_str(),
-                       redis_certfile_.c_str(), redis_keyfile_.c_str(), "sni");
+            redisSSLContextError ssl_error = REDIS_SSL_CTX_NONE;
+            redisSSLContext *ssl_ctx = redisCreateSSLContext(
+                redis_ca_cert_.c_str(),
+                NULL,
+                redis_certfile_.c_str(),
+                redis_keyfile_.c_str(),
+                "sni",
+                &ssl_error);
+            if (!ssl_ctx || ssl_error != REDIS_SSL_CTX_NONE) {
+                QE_LOG_NOQID(ERROR, "Cannot start pipeline for " << qid <<
+                                " SSL Context Error: " << redisSSLContextGetError(ssl_error));
+                if (ssl_ctx) redisFreeSSLContext(ssl_ctx);
+                redisFree(c);
+                qs.set_error("Redis SSL Context Error");
+                QUERY_PERF_INFO_SEND(Sandesh::source(), "__UNKNOWN__", qs);
+                return;
+            }
+            int rc = redisInitiateSSLWithContext(c, ssl_ctx);
             if (rc != REDIS_OK) {
                 QE_LOG_NOQID(ERROR, "Cannot start pipeline for " << qid <<
                                 " SSL Connection Error: " << c->errstr);
+                redisFreeSSLContext(ssl_ctx);
                 redisFree(c);
                 qs.set_error("Redis SSL Connection Error");
                 QUERY_PERF_INFO_SEND(Sandesh::source(), "__UNKNOWN__", qs);
                 return;
             }
+            redisFreeSSLContext(ssl_ctx);
         }
 
         //Authenticate the context with password

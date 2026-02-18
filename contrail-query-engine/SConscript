@@ -24,6 +24,8 @@ env.Prepend(LIBS=[  'cpuinfo',
                     'pugixml',
                     'xml',
                     'curl',
+                    'hiredis_boostasio',
+                    'hiredis_ssl',
                     'hiredis',
                     'process_info',
                     'io',
@@ -36,6 +38,10 @@ env.Prepend(LIBS=[  'cpuinfo',
                     'boost_filesystem',
                     'boost_program_options'])
 
+# libhiredis_ssl needs symbols from libhiredis; group link so they resolve on all linkers
+env.Append(LINKFLAGS=['-Wl,--start-group', '-lhiredis_boostasio', '-lhiredis_ssl', '-lhiredis', '-Wl,--end-group'])
+
+env.Append(LIBPATH=['/usr/lib64', '/usr/lib'])
 
 env.Append(LIBS=['rt'])
 
@@ -96,7 +102,7 @@ SandeshGenObjs = env.Object(SandeshGenSrcs)
 env['QE_SANDESH_GEN_OBJS'] = SandeshGenObjs
 
 buildinfo_dep_libs = [
-    '../../lib/libhiredis.a',
+    '../../lib/libhiredis_boostasio.a',
     '../../lib/libhttp.a',
     '../../lib/libhttp_parser.a',
     '../../lib/libsandesh.a', 
@@ -163,8 +169,8 @@ qedt = env.UnitTest(
 env.Alias("contrail-query-engine", qed)
 env.Alias("src/query_engine:qedt", qedt)
 
-env.Depends(qed, '#/build/include/hiredis/hiredis.h')
-env.Depends(qedt, '#/build/include/hiredis/hiredis.h')
+env.Depends(qed, '#/build/include/hiredis/boostasio.hpp')
+env.Depends(qedt, '#/build/include/hiredis/boostasio.hpp')
 
 QueryEnv = env.Clone()
 env.Default(qed)

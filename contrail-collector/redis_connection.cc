@@ -13,6 +13,7 @@
 #include "base/logging.h"
 #include "base/parse_object.h"
 #include "hiredis/hiredis.h"
+#include "hiredis/hiredis_ssl.h"
 #include "hiredis/base64.h"
 #include "hiredis/boostasio.hpp"
 
@@ -213,10 +214,18 @@ bool RedisAsyncConnection::RAC_Connect(void) {
 
     /* Secure the connection if SSL enabled */
     if (redis_ssl_enable_) {
-        int rc = redisSecureConnection(&context_->c, redis_ca_cert_.c_str(),
-                        redis_certfile_.c_str(), redis_keyfile_.c_str(), "sni");
-        if (rc != REDIS_OK) {
-            LOG(DEBUG, "RAC_Connect: redisSecureConnection() failed: " << (&context_->c)->errstr);
+        redisSSLContextError ssl_error = REDIS_SSL_CTX_NONE;
+        redisSSLContext *ssl_ctx = redisCreateSSLContext(
+            redis_ca_cert_.c_str(),
+            NULL,
+            redis_certfile_.c_str(),
+            redis_keyfile_.c_str(),
+            "sni",
+            &ssl_error);
+        if (!ssl_ctx || ssl_error != REDIS_SSL_CTX_NONE) {
+            LOG(DEBUG, "RAC_Connect: redisCreateSSLContext() failed: "
+                << redisSSLContextGetError(ssl_error));
+            if (ssl_ctx) redisFreeSSLContext(ssl_ctx);
             boost::system::error_code ec;
             reconnect_timer_.expires_from_now(
                          boost::posix_time::seconds(RedisAsyncConnection::RedisReconnectTime), ec);
@@ -225,6 +234,21 @@ bool RedisAsyncConnection::RAC_Connect(void) {
             context_ = NULL;
             return true;
         }
+
+        int rc = redisInitiateSSLWithContext(&context_->c, ssl_ctx);
+        if (rc != REDIS_OK) {
+            LOG(DEBUG, "RAC_Connect: redisInitiateSSLWithContext() failed: "
+                << (&context_->c)->errstr);
+            redisFreeSSLContext(ssl_ctx);
+            boost::system::error_code ec;
+            reconnect_timer_.expires_from_now(
+                         boost::posix_time::seconds(RedisAsyncConnection::RedisReconnectTime), ec);
+            reconnect_timer_.async_wait(boost::bind(&RedisAsyncConnection::RAC_Reconnect, this,
+                                   boost::asio::placeholders::error));
+            context_ = NULL;
+            return true;
+        }
+        redisFreeSSLContext(ssl_ctx);
     }
 
     client_.reset(new redisBoostClient(*evm_->io_service(), context_, mutex_));
