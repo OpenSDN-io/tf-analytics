@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 #
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
+#
 # Contrail Opserver documentation build configuration file, created by
 # sphinx-quickstart on Tue Apr 23 15:11:04 2013.
 #

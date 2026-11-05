@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Juniper Networks
+ * Copyright Contributors to the OpenSDN project
+ */
+
+
 // actual google test classes
 
 #include <boost/bind/bind.hpp>

@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2017 Juniper Networks, Inc. All rights reserved.
+// Copyright Contributors to the OpenSDN project
 //
 
 #ifndef ANALYTICS_STRUCTURED_SYSLOG_SERVER_H_

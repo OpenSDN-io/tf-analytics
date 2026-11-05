@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2017 Juniper Networks, Inc. All rights reserved.
+# Copyright Contributors to the OpenSDN project
 #
 
 from .topology_config_db import DBBaseCT, LogicalInterfaceCT, \

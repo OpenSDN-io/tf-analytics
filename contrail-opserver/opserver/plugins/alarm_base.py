@@ -1,3 +1,8 @@
+#
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
+#
+
 class AlarmBase(object):
     """Base class for Alarms
     """

@@ -8,7 +8,10 @@
 # Created by Anish Mehta on 05/16/2013
 #
 # Copyright (c) 2013, Contrail Systems, Inc. All rights reserved.
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
 #
+
 
 from gevent import monkey
 monkey.patch_all()

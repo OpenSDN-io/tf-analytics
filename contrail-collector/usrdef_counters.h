@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Juniper Networks, Inc. All rights reserved.
+ * Copyright Contributors to the OpenSDN project
  */
 #ifndef __USER_DEFINED_COUNTER_H__
 #define __USER_DEFINED_COUNTER_H__

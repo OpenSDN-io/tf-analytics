@@ -1,3 +1,8 @@
+#
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
+#
+
 import sys
 import json
 import gevent

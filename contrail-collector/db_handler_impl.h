@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2015 Juniper Networks, Inc. All rights reserved.
+// Copyright Contributors to the OpenSDN project
 //
 
 #ifndef ANALYTICS_DB_HANDLER_IMPL_H_

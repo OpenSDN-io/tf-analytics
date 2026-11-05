@@ -1,3 +1,8 @@
+#
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
+#
+
 from opserver.plugins.alarm_base import *
 from opserver.sandesh.alarmgen_ctrl.sandesh_alarm_base.ttypes import *
 

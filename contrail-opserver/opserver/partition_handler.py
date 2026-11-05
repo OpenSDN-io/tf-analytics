@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+#
+# Copyright (c) Juniper Networks
+# Copyright Contributors to the OpenSDN project
+#
 
 from gevent import monkey
 monkey.patch_all()
